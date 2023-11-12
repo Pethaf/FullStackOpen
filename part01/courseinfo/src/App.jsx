@@ -7,15 +7,19 @@ const App = () => {
     </header>
   }
 
-  const Content = ({ content }) => {
-    return <p>
-      {content}
-    </p>
+  const Content = ({ parts }) => {
+    return <>
+    {parts.map(part => <Part {...part} key={part.name}/>)}
+    </>
+
   }
 
+  const Part = ({ name, exercises }) => {
+    return <p> {name} {exercises}</p>
+  }
 
-  const Total = ({ total }) => {
-    return <p>Number of exercises {total}</p>
+  const Total = ({ parts }) => {
+    return <p>Number of exercises {parts.reduce((accumulator, currentValue) => accumulator+currentValue.exercises,0)}</p>
   }
   const course = {
     name: 'Half Stack application development',
@@ -35,19 +39,14 @@ const App = () => {
     ]
   }
 
-  const Part = ({ name, exercises }) => {
-    return <p> {name} {exercises}</p>
-  }
+ 
 
 
   return (
     <div>
       <Header {...course} />
-      {course.parts.map(part => {
-        return <Part {...part} key={part.name}/>
-      })}
-      <p>Number of exercises {course.parts.reduce((accumulator, currentValue) => {return accumulator+currentValue.exercises}, 0,)}</p>
-
+      <Content {...course} />
+      <Total {...course} />
     </div>
   )
 }
