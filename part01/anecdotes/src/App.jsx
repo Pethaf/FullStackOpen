@@ -28,7 +28,6 @@ const App = () => {
       <h2>The anecdote with the most votes</h2>
       <p>{anecdotes[indexOfMaxVotes]}</p>
       <p>Has {`${maxVotes} ${maxVotes == 1 ? "vote": "votes"}`}</p>
-      
     </div>
   )
 }
