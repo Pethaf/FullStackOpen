@@ -22,7 +22,7 @@ const update = (person) => {
 }
 
 const returnData = (theRequest) => {
-    return theRequest.then(response => response.data);
+    return theRequest.then(result => result.data);
 }
 
 export default { getAll, create, remove, update}
