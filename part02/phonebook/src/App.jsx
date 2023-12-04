@@ -26,7 +26,8 @@ const App = () => {
         setNumber("");
         setNewName("");
         displayNotification(`Added ${newPerson.name}`)
-      }).catch(error => {displayError(error.message)})
+      }).catch(error => {displayError(error.message)}
+      )
     }
     else {
       const confirmUpdatePerson = confirm(`${person.name} is already added to phonebook, replace old number with new one?`)
