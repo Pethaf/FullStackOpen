@@ -19,7 +19,7 @@ const App = () => {
   return (
     <>
       <Filter value={searchTerm} onChange={handleChange} />
-      <CountriesContainer countries={allCountries.filter(country => country.name.common.toLowerCase().includes(searchTerm.toLowerCase()))} changeSearchTerm={setSearchTerm} />
+      <CountriesContainer countries={allCountries.filter(country => country.name.common.toLowerCase().includes(searchTerm.toLowerCase() ))} changeSearchTerm={setSearchTerm} />
     </>
   )
 }

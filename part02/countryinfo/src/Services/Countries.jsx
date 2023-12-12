@@ -10,6 +10,6 @@ const returnData = (theRequest) => {
     return theRequest.then(result => result.data)
 }
 
-export default {
+export default{
     getAllCountries, getCountryByName
 }
