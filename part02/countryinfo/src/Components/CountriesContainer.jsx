@@ -1,7 +1,7 @@
 import { Country } from "./Country"
 
 const CountriesContainer = ({countries,changeSearchTerm}) => {
-  if(countries.length > 10){
+    if(countries.length > 10){
         return (
             <p>
               Too many matches, specify another filter
