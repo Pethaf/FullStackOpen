@@ -6,7 +6,7 @@ app.use(cors())
 app.use(express.json())
 app.use(express.static('dist'))
 
-let notes = [
+/*let notes = [
     {
       id: 1,
       content: "HTML is easy",
@@ -29,7 +29,7 @@ const generateId = () => {
     : 0
   return maxId + 1
 }
-
+*/
 app.get(`/`, (request, response) => {
     response.send(`<h1>Hello World</h1>`)
 } )
@@ -52,17 +52,19 @@ app.get(`/api/notes`, (request, response) => {
     response.json(notes)
 })
 
-app.post(`/api/notes/`, (request, response) => {
-  const note = request.body
-  if(!note.content){ 
-    return response.status(400).json({
-      error: 'content missing'
-    })}
-  const newNote = 
-  {...note, id:`${generateId()}`, 
-   important:note.important || false}
-  notes.concat(newNote)
-  response.json(newNote)
+app.post('/api/notes', (request, response, next) => {
+  const body = request.body
+
+  const note = new Note({
+    content: body.content,
+    important: body.important || false,
+  })
+
+  note.save()
+    .then(savedNote => {
+      response.json(savedNote)
+    })
+    .catch(error => next(error))
 })
 
 app.put(`/api/notes/`,(request,response)=>{

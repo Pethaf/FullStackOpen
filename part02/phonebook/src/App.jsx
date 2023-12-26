@@ -12,7 +12,7 @@ const App = () => {
       personService.getAll().then(initialPeople => { setPersons(initialPeople) });
     }, [])
   const [persons, setPersons] = useState([])
-  const [number, setNumber] = useState("")
+  const [phoneNumber, setPhoneNumber] = useState("")
   const [newName, setNewName] = useState('')
   const [filterTerm, setFilterTerm] = useState("")
   const [notificationMessage, setNotificationMessage] = useState("")
@@ -20,19 +20,20 @@ const App = () => {
   const addPerson = () => {
     const person = persons.find(person => person.name == newName);
     if (!person) {
-      const newPerson = { name: `${newName}`, number: `${number}` }
+      const newPerson = { name: `${newName}`, phoneNumber: `${phoneNumber}` }
       personService.create(newPerson).then(response => {
         setPersons([...persons, { ...response }])
-        setNumber("");
+        setPhoneNumber("");
         setNewName("");
         displayNotification(`Added ${newPerson.name}`)
-      }).catch(error => {displayError(error.message)}
+      }).catch(error => {      
+        displayError(error.response.data.error)}
       )
     }
     else {
       const confirmUpdatePerson = confirm(`${person.name} is already added to phonebook, replace old number with new one?`)
       if(confirmUpdatePerson){
-        const newPerson = {...person, number}
+        const newPerson = {name: person.name, phoneNumber, id:person.id}
         personService.update(newPerson).then(
           response => {
             const indexOfPerson = persons.findIndex(person => person.id == newPerson.id);
@@ -40,13 +41,14 @@ const App = () => {
             newPersons[indexOfPerson] = {...newPerson}
             setPersons(newPersons);
             displayNotification(`Updated ${newPerson.name}`)
-          } 
+          }  
         ).catch(error =>{
-          displayError(error.message)
+          displayError(error.response.data.error)
+
         })
       }
       setNewName("")
-      setNumber("")
+      setPhoneNumber("")
     }
   }
 
@@ -64,12 +66,12 @@ const App = () => {
   }
   const displayNotification = (message) => {
     setNotificationMessage(message)
-    setTimeout(() => {setNotificationMessage("")},2000);
+    setTimeout(() => {setNotificationMessage("")},5000);
   }
 
   const displayError =(message) => {
     setErrorMessage(message)
-    setTimeout(() => {setNotificationMessage(""),2000});
+    setTimeout(() => {setErrorMessage("")},5000);
   }
   return (
     <div>
@@ -81,7 +83,7 @@ const App = () => {
         addPerson();
       }}>
         <FilterInput callback={setFilterTerm} filterValue={filterTerm} />
-        <AddPersonInput newName={newName} number={number} setNewName={setNewName} setNumber={setNumber} />
+        <AddPersonInput newName={newName} phoneNumber={phoneNumber} setNewName={setNewName} setPhoneNumber={setPhoneNumber} />
         <FilteredPhoneList people={persons} filterTerm={filterTerm} deletePerson={deletePerson} />
       </form>
 
