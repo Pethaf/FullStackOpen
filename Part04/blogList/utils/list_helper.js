@@ -61,6 +61,7 @@ const mostLikes = (listOfBlogs) => {
     { 'author' : '', likes:0 })
   }
 }
+
 module.exports = {
   dummy, totalLikes, favoriteBlog, mostBlogs, mostLikes
 }
