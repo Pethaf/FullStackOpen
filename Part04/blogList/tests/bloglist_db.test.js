@@ -21,6 +21,15 @@ test('Fetches blogs from database', async () => {
   const result = await api.get('/api/blogs')
   expect(result.body.length).toBe(helper.initialBlogs.length)
 })
+
+test('Test that fetched blog posts have a property called id ', async () => {
+  const result = await api.get('/api/blogs')
+  result.body.forEach(blog => {
+    expect(blog).toMatchSnapshot({
+      id: expect.any(String)
+    })
+  })
+})
 afterAll(async () => {
   await mongoose.connection.close()
 })

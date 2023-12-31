@@ -1,0 +1,61 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Test that fetched blog posts have a property called id  1`] = `
+{
+  "author": "Michael Chan",
+  "id": Any<String>,
+  "likes": 7,
+  "title": "React patterns",
+  "url": "https://reactpatterns.com/",
+}
+`;
+
+exports[`Test that fetched blog posts have a property called id  2`] = `
+{
+  "author": "Edsger W. Dijkstra",
+  "id": Any<String>,
+  "likes": 5,
+  "title": "Go To Statement Considered Harmful",
+  "url": "http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html",
+}
+`;
+
+exports[`Test that fetched blog posts have a property called id  3`] = `
+{
+  "author": "Edsger W. Dijkstra",
+  "id": Any<String>,
+  "likes": 12,
+  "title": "Canonical string reduction",
+  "url": "http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html",
+}
+`;
+
+exports[`Test that fetched blog posts have a property called id  4`] = `
+{
+  "author": "Robert C. Martin",
+  "id": Any<String>,
+  "likes": 2,
+  "title": "Type wars",
+  "url": "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
+}
+`;
+
+exports[`Test that fetched blog posts have a property called id  5`] = `
+{
+  "author": "Robert C. Martin",
+  "id": Any<String>,
+  "likes": 10,
+  "title": "First class tests",
+  "url": "http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll",
+}
+`;
+
+exports[`Test that fetched blog posts have a property called id  6`] = `
+{
+  "author": "Robert C. Martin",
+  "id": Any<String>,
+  "likes": 0,
+  "title": "TDD harms architecture",
+  "url": "http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html",
+}
+`;
