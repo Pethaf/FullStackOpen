@@ -37,8 +37,8 @@ describe("Structure of saved blog posts", () => {
   })
 })
 
-describe("Can create new blog", () => {
-  test("Posting a blog to api works", async () => {
+describe('Can create new blog', () => {
+  test('Posting a blog to api works', async () => {
     const newBlog = {
       title: 'All coding and no play',
       author: 'Mr X',
@@ -51,8 +51,27 @@ describe("Can create new blog", () => {
       .expect('Content-Type', /application\/json/)
     const blogs = await api.get('/api/blogs')
     expect(helper.initialBlogs.length).toBe(blogs.body.length-1)
-    const indexOfBlog = blogs.body.find(blog => {return blog.title === newBlog.title && blog.author === newBlog.author})
-    expect(indexOfBlog).not.toBe(-1)
+    const createdBlog = blogs.body.find(
+      blog => {return (blog.author === newBlog.author &&
+                      blog.title === newBlog.title)})
+    expect(createdBlog).toBeDefined()}
+  )})
+describe('Blog likes defaults to 0 if not otherwise specified', () => {
+  test('Check that blog post with no specified like defaults to 0 likes', async () => {
+    const newBlog = {
+      title: 'Interesting Stuff',
+      author: 'Mr. Y',
+      url: 'http://unknown.com'
+    }
+    await api.post('/api/blogs')
+      .send(newBlog)
+    const blogsInRemoteDB = await api.get('/api/blogs')
+    console.log(blogsInRemoteDB)
+    const createdBlogPost = blogsInRemoteDB.body.find(blog =>
+    {return (blog.title === newBlog.title &&
+          blog.author === newBlog.author &&
+          blog.url === newBlog.url)})
+    expect(createdBlogPost.likes).toBe(0)
   })})
 
 afterAll(async () => {
