@@ -56,7 +56,7 @@ describe('Can create new blog', () => {
                       blog.title === newBlog.title)})
     expect(createdBlog).toBeDefined()}
   )})
-describe('Blog likes defaults to 0 if not otherwise specified', () => {
+describe('Missing content in blog post', () => {
   test('Check that blog post with no specified like defaults to 0 likes', async () => {
     const newBlog = {
       title: 'Interesting Stuff',
@@ -71,8 +71,25 @@ describe('Blog likes defaults to 0 if not otherwise specified', () => {
     {return (blog.title === newBlog.title &&
           blog.author === newBlog.author &&
           blog.url === newBlog.url)})
-    expect(createdBlogPost.likes).toBe(0)
-  })})
+    expect(createdBlogPost.likes).toBe(0)})
+
+    test('Blog post with missing title returns error 400', async () => {
+    const badBlogPost = {
+      author: 'Mr Y',
+      likes: 0,
+      url: 'http://www.unknown.com'
+    }
+    await api.post('/api/blogs').send(badBlogPost).expect(400)
+  })
+  test('Blog post with missing url returns error 400', async () => {
+    const badBlogPost = {
+      author: 'Mr Y',
+      likes: 0,
+      title: 'Testing for fun and profit'
+    }
+    await api.post('/api/blogs').send(badBlogPost).expect(400)
+  })
+})
 
 afterAll(async () => {
   await mongoose.connection.close()
