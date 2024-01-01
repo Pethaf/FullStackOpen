@@ -32,10 +32,28 @@ describe("Structure of saved blog posts", () => {
   test('Test that fetched blog posts do not have a property called _id', async () => {
     const result = await api.get('/api/blogs')
     result.body.forEach(blog => {
-        expect(blog._id).not.toBeDefined()
+      expect(blog._id).not.toBeDefined()
     })
   })
 })
+
+describe("Can create new blog", () => {
+  test("Posting a blog to api works", async () => {
+    const newBlog = {
+      title: 'All coding and no play',
+      author: 'Mr X',
+      likes: 4,
+      url:'http://unknown.com'
+    }
+    await api.post('/api/blogs').
+      send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+    const blogs = await api.get('/api/blogs')
+    expect(helper.initialBlogs.length).toBe(blogs.body.length-1)
+    const indexOfBlog = blogs.body.find(blog => {return blog.title === newBlog.title && blog.author === newBlog.author})
+    expect(indexOfBlog).not.toBe(-1)
+  })})
 
 afterAll(async () => {
   await mongoose.connection.close()
