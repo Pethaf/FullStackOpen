@@ -91,6 +91,26 @@ describe('Missing content in blog post', () => {
   })
 })
 
+describe('delete a blog', () => {
+  let deleteId
+  const blogToDelete = {
+    author: 'Mr.Z',
+    title: 'DeleteMe',
+    url: 'http://www.unknown.com',
+  }
+
+  test('deleting a blog decreases count of blogs in database by one', async () => {
+    const tmp = await api.post('/api/blogs').send(blogToDelete)
+    deleteId= tmp._body.id
+    await api.delete(`/api/blogs/${deleteId}`).expect(204)
+    const blogsInDb = await api.get('/api/blogs')
+    expect(blogsInDb.body).toHaveLength(helper.initialBlogs.length)
+  })
+  test('deleting a blog that has already been deleted returns a 404', async () => {
+    await api.delete(`/api/blogs/${deleteId}`).expect(404)
+  })
+})
+
 afterAll(async () => {
   await mongoose.connection.close()
 })
