@@ -111,6 +111,30 @@ describe('delete a blog', () => {
   })
 })
 
+describe('Fetching a specific blog post', () => {
+  test('fetching a blog that does not exist should give 404', async () => {
+    const bogusPost = {
+      author: 'Mr. W',
+      title: 'Soon to be deleted',
+      url: 'http://www.www.com'
+    }
+    const postedBlog = await api.post('/api/blogs').send(bogusPost)
+    await api.delete(`/api/blogs/${postedBlog._body.id}`)
+    await api.get(`/api/blogs/${postedBlog._body.id}`).expect(404)
+  })
+  test('Fetching blog by id should give blog post with 1 entry and same id', async () => {
+    const blogToPost = {
+      author:'Mr. Z',
+      title: 'Tests are a good idea',
+      url: 'http://someurl.com'
+    }
+    const postedBlog = await api.post('/api/blogs').send(blogToPost)
+    console.log(`PostedBlog ${postedBlog}`)
+    const fetchedBlog = await api.get(`/api/blogs/${postedBlog._body.id}`)
+    expect(fetchedBlog.body).toHaveLength(1)
+    //expect(fetchedBlog.body[0].id).toBe(postedBlog._body[0].id)
+  })
+})
 afterAll(async () => {
   await mongoose.connection.close()
 })

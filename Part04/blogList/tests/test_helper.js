@@ -59,7 +59,7 @@ const blogsInDb = async () => {
 const nonExistingId = async () => {
   const blog = new Blog({ title: 'willremovethissoon',author: 'Unknown Unknownson',url:'http://unknown.com',likes:0 })
   await blog.save()
-  await blog.deleteteOne()
+  await blog.deleteOne()
   return blog._id.toString()
 }
 
