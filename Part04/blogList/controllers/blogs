@@ -5,7 +5,8 @@ blogsRouter.get('/', (req,res) => {
 })
 blogsRouter.get('/blogs',async (req,res) => {
   const blogs = await Blog.find({})
-  res.send(blogs)
+  const listOfBlogs = blogs.map(blog => blog)
+  res.send(listOfBlogs)
 })
 
 blogsRouter.post('/blogs', async (req,res) => {
@@ -31,15 +32,22 @@ blogsRouter.delete('/blogs/:id', async (req, res) => {
 } )
 
 blogsRouter.get('/blogs/:id', async (req, res) => {
-  console.log('get by id')
+  console.log(`get by id ${req.params.id}`)
   const blog = await Blog.findById(req.params.id)
+  const tmp = []
+  tmp.push(blog)
   if(blog){
-    res.send([{ ...blog }])
+    res.send(tmp)
   }
   else {
     res.status(404).end()
   }
 
+})
+
+blogsRouter.put('/blogs/:id', async (req, res) => {
+  console.log('Put')
+  res.status(404).end()
 })
 module.exports = blogsRouter
 
