@@ -131,7 +131,6 @@ describe('Fetching a specific blog post', () => {
     const postedBlog = await api.post('/api/blogs').send(blogToPost)
     console.log(`PostedBlog ${postedBlog.body.id}`)
     const fetchedBlog = await api.get(`/api/blogs/${postedBlog.body.id}`)
-    console.log(`FetchedBlog: ${Object.keys(fetchedBlog)}`)
     expect(fetchedBlog.body).toHaveLength(1)
     expect(fetchedBlog.body[0].id).toBe(postedBlog.body.id)
   })
@@ -142,34 +141,36 @@ describe('Updating blog', () => {
     title: 'Tests are a good idea',
     url: 'http://someurl.com'
   }
-  test('Updating a blog post that does not exist should be error', async () => {
+  test('Updating a blog post that does not exist should create it', async () => {
     const recieved = await api.post('/api/blogs').send(blogToPost)
-    await api.delete(`/api/blogs/${recieved.body.id}`)
-    await api.put(`/api/blogs/${recieved.body.id}`).send({ ...blogToPost,likes:2 }).expect(404)
+    console.log(`Recieved test: ${recieved._body.id}`)
+    await api.delete(`/api/blogs/${recieved._body.id}`)
+    await api.put(`/api/blogs/${recieved.body.id}`).send({ ...blogToPost,likes:2 }).expect(201)
   })
   test('Updating author', async () => {
-    const recieved = await api.post('/api/blog').send(blogToPost)
-    await api.put(`/api/blog/${recieved.body.id}`).send({ author:'Mr Y' })
-    const updated = await api.get(`/api/blog/${recieved.body.id}`)
-    expect(updated.body.author).toEqual('Mr Y')
+    const recieved = await api.post('/api/blogs').send(blogToPost)
+    console.log(`Recieved: ${Object.keys(recieved._body)}`)
+    await api.put(`/api/blogs/${recieved._body.id}`).send({ ...blogToPost, author:'Mr Y' })
+    const updated = await api.get(`/api/blogs/${recieved.body.id}`)
+    expect(updated.body[0].author).toEqual('Mr Y')
   })
   test('Updating title', async () => {
-    const recieved = await api.post('/api/blog').send(blogToPost)
-    await api.put(`/api/blog/${recieved.body.id}`).send({ title: 'Updated Title' })
-    const updated = await api.get(`/api/blog/${recieved.body.id}`)
-    expect(updated.body.title).toEqual('Updated Title')
+    const recieved = await api.post('/api/blogs').send(blogToPost)
+    await api.put(`/api/blogs/${recieved.body.id}`).send({ ...blogToPost, title: 'Updated Title' })
+    const updated = await api.get(`/api/blogs/${recieved.body.id}`)
+    expect(updated.body[0].title).toEqual('Updated Title')
   })
   test('Updating url', async () => {
-    const recieved = await api.post('/api/blog').send(blogToPost)
-    await api.put(`/api/blog/${recieved.body.id}`).send({ url: 'Updated Url' })
-    const updated = await api.get(`/api/blog/${recieved.body.id}`)
-    expect(updated.body.url).toEqual('Updated Url')
+    const recieved = await api.post('/api/blogs').send(blogToPost)
+    await api.put(`/api/blogs/${recieved.body.id}`).send({ ...blogToPost, url: 'Updated Url' })
+    const updated = await api.get(`/api/blogs/${recieved.body.id}`)
+    expect(updated.body[0].url).toEqual('Updated Url')
   })
   test('Updating likes', async () => {
-    const recieved = await api.post('/api/blog').send(blogToPost)
-    await api.put(`/api/blog/${recieved.body.id}`).send({ likes: 55 })
-    const updated = await api.get(`/api/blog/${recieved.body.id}`)
-    expect(updated.body.likes).toEqual(55)
+    const recieved = await api.post('/api/blogs').send(blogToPost)
+    await api.put(`/api/blogs/${recieved.body.id}`).send({ ...blogToPost, likes: 55 })
+    const updated = await api.get(`/api/blogs/${recieved.body.id}`)
+    expect(updated.body[0].likes).toEqual(55)
   })
 })
 afterAll(async () => {

@@ -46,8 +46,16 @@ blogsRouter.get('/blogs/:id', async (req, res) => {
 })
 
 blogsRouter.put('/blogs/:id', async (req, res) => {
-  console.log('Put')
-  res.status(404).end()
+  const result = await Blog.findByIdAndUpdate(req.params.id, { ...req.body }, { new: true, upsert:true, includeResultMetadata: true })
+  //console.log(`Id equal? ${req.body.id === result.value._doc._id}`)
+  //console.log(`Testing: ${Object.keys(req.body)}`)
+  //console.log(`Result: ${Object.keys(result.value._doc)}`)
+  if(req.body.id !== result.value._doc._id){
+    res.status(201).json(result.value._doc).end()
+  }
+  else{
+    res.status(204).json(result.value._doc)
+  }
 })
 module.exports = blogsRouter
 
