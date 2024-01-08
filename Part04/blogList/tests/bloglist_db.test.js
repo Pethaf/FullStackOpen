@@ -66,7 +66,6 @@ describe('Missing content in blog post', () => {
     await api.post('/api/blogs')
       .send(newBlog)
     const blogsInRemoteDB = await api.get('/api/blogs')
-    console.log(blogsInRemoteDB)
     const createdBlogPost = blogsInRemoteDB.body.find(blog =>
     {return (blog.title === newBlog.title &&
           blog.author === newBlog.author &&
@@ -129,7 +128,6 @@ describe('Fetching a specific blog post', () => {
       url: 'http://someurl.com'
     }
     const postedBlog = await api.post('/api/blogs').send(blogToPost)
-    console.log(`PostedBlog ${postedBlog.body.id}`)
     const fetchedBlog = await api.get(`/api/blogs/${postedBlog.body.id}`)
     expect(fetchedBlog.body).toHaveLength(1)
     expect(fetchedBlog.body[0].id).toBe(postedBlog.body.id)

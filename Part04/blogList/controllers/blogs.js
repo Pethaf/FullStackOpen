@@ -32,7 +32,6 @@ blogsRouter.delete('/blogs/:id', async (req, res) => {
 } )
 
 blogsRouter.get('/blogs/:id', async (req, res) => {
-  console.log(`get by id ${req.params.id}`)
   const blog = await Blog.findById(req.params.id)
   const tmp = []
   tmp.push(blog)
