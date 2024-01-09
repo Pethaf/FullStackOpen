@@ -39,4 +39,8 @@ describe('When there is one user in the db', () => {
     const usersAtEnd = await helper.usersInDb()
     expect(usersAtEnd).toEqual(usersAtStart)
   })
+  test('One user in user database', async () => {
+    const users = await api.get('/api/users').expect('Content-Type', /application\/json/)
+    expect(users.body).toHaveLength(1)
+  })
 })
