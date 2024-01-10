@@ -16,8 +16,11 @@ blogsRouter.post('/blogs', async (req,res) => {
   }
   else {
     const body = req.body
-    const blogToPost = new Blog(body)
+    const theUser = await User.findById(body.userId)
+    const blogToPost = new Blog({ ...body, user: theUser.id })
     const result = await blogToPost.save()
+    theUser.blogs.concat(result._id)
+    await theUser.save()
     res.status(201).json(result)
   }
 })
