@@ -1,5 +1,6 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
+const User = require('../models/user')
 blogsRouter.get('/', (req,res) => {
   res.send('Test').end()
 })
@@ -14,7 +15,8 @@ blogsRouter.post('/blogs', async (req,res) => {
     res.status(400).end()
   }
   else {
-    const blogToPost = new Blog(req.body)
+    const body = req.body
+    const blogToPost = new Blog(body)
     const result = await blogToPost.save()
     res.status(201).json(result)
   }

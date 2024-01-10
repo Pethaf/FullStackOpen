@@ -39,11 +39,14 @@ describe("Structure of saved blog posts", () => {
 
 describe('Can create new blog', () => {
   test('Posting a blog to api works', async () => {
+    const users = await helper.usersInDb()
+    const userId = users[0].id
     const newBlog = {
       title: 'All coding and no play',
       author: 'Mr X',
       likes: 4,
-      url:'http://unknown.com'
+      url:'http://unknown.com',
+      userId
     }
     await api.post('/api/blogs').
       send(newBlog)
@@ -55,13 +58,17 @@ describe('Can create new blog', () => {
       blog => {return (blog.author === newBlog.author &&
                       blog.title === newBlog.title)})
     expect(createdBlog).toBeDefined()}
-  )})
+  )
+})
 describe('Missing content in blog post', () => {
   test('Check that blog post with no specified like defaults to 0 likes', async () => {
+    const users = await helper.usersInDb()
+    const userId = users[0].id
     const newBlog = {
       title: 'Interesting Stuff',
       author: 'Mr. Y',
-      url: 'http://unknown.com'
+      url: 'http://unknown.com',
+      userId
     }
     await api.post('/api/blogs')
       .send(newBlog)
@@ -72,19 +79,25 @@ describe('Missing content in blog post', () => {
           blog.url === newBlog.url)})
     expect(createdBlogPost.likes).toBe(0)})
 
-    test('Blog post with missing title returns error 400', async () => {
+  test('Blog post with missing title returns error 400', async () => {
+    const users = await helper.usersInDb()
+    const userId = users[0].id
     const badBlogPost = {
       author: 'Mr Y',
       likes: 0,
-      url: 'http://www.unknown.com'
+      url: 'http://www.unknown.com',
+      userId
     }
     await api.post('/api/blogs').send(badBlogPost).expect(400)
   })
   test('Blog post with missing url returns error 400', async () => {
+    const users = await helper.usersInDb()
+    const userId = users[0].id
     const badBlogPost = {
       author: 'Mr Y',
       likes: 0,
-      title: 'Testing for fun and profit'
+      title: 'Testing for fun and profit',
+      userId
     }
     await api.post('/api/blogs').send(badBlogPost).expect(400)
   })
@@ -99,7 +112,10 @@ describe('delete a blog', () => {
   }
 
   test('deleting a blog decreases count of blogs in database by one', async () => {
-    const tmp = await api.post('/api/blogs').send(blogToDelete)
+    const users = await helper.usersInDb()
+    const userId = users[0].id
+    
+    const tmp = await api.post('/api/blogs').send({...blogToDelete, userId})
     deleteId= tmp._body.id
     await api.delete(`/api/blogs/${deleteId}`).expect(204)
     const blogsInDb = await api.get('/api/blogs')
@@ -112,20 +128,27 @@ describe('delete a blog', () => {
 
 describe('Fetching a specific blog post', () => {
   test('fetching a blog that does not exist should give 404', async () => {
+    const users = await helper.usersInDb()
+    const userId = users[0].id  
     const bogusPost = {
       author: 'Mr. W',
       title: 'Soon to be deleted',
-      url: 'http://www.www.com'
+      url: 'http://www.www.com',
+      userId
     }
     const postedBlog = await api.post('/api/blogs').send(bogusPost)
     await api.delete(`/api/blogs/${postedBlog._body.id}`)
     await api.get(`/api/blogs/${postedBlog._body.id}`).expect(404)
   })
   test('Fetching blog by id should give blog post with 1 entry and same id', async () => {
+    const users = await helper.usersInDb()
+    const userId = users[0].id
+
     const blogToPost = {
       author:'Mr. Z',
       title: 'Tests are a good idea',
-      url: 'http://someurl.com'
+      url: 'http://someurl.com',
+      userId
     }
     const postedBlog = await api.post('/api/blogs').send(blogToPost)
     const fetchedBlog = await api.get(`/api/blogs/${postedBlog.body.id}`)
@@ -137,36 +160,46 @@ describe('Updating blog', () => {
   const blogToPost = {
     author:'Mr. Z',
     title: 'Tests are a good idea',
-    url: 'http://someurl.com'
+    url: 'http://someurl.com',
   }
   test('Updating a blog post that does not exist should create it', async () => {
-    const recieved = await api.post('/api/blogs').send(blogToPost)
+    const users = await helper.usersInDb()
+    const userId = users[0].id
+    const recieved = await api.post('/api/blogs').send({...blogToPost, userId})
     console.log(`Recieved test: ${recieved._body.id}`)
     await api.delete(`/api/blogs/${recieved._body.id}`)
     await api.put(`/api/blogs/${recieved.body.id}`).send({ ...blogToPost,likes:2 }).expect(201)
   })
   test('Updating author', async () => {
+    const users = await helper.usersInDb()
+    const userId = users[0].id
     const recieved = await api.post('/api/blogs').send(blogToPost)
     console.log(`Recieved: ${Object.keys(recieved._body)}`)
-    await api.put(`/api/blogs/${recieved._body.id}`).send({ ...blogToPost, author:'Mr Y' })
+    await api.put(`/api/blogs/${recieved._body.id}`).send({ ...blogToPost, author:'Mr Y', userId })
     const updated = await api.get(`/api/blogs/${recieved.body.id}`)
     expect(updated.body[0].author).toEqual('Mr Y')
   })
   test('Updating title', async () => {
+    const users = await helper.usersInDb()
+    const userId = users[0].id
     const recieved = await api.post('/api/blogs').send(blogToPost)
-    await api.put(`/api/blogs/${recieved.body.id}`).send({ ...blogToPost, title: 'Updated Title' })
+    await api.put(`/api/blogs/${recieved.body.id}`).send({ ...blogToPost, title: 'Updated Title', userId })
     const updated = await api.get(`/api/blogs/${recieved.body.id}`)
     expect(updated.body[0].title).toEqual('Updated Title')
   })
   test('Updating url', async () => {
+    const users = await helper.usersInDb()
+    const userId = users[0].id
     const recieved = await api.post('/api/blogs').send(blogToPost)
-    await api.put(`/api/blogs/${recieved.body.id}`).send({ ...blogToPost, url: 'Updated Url' })
+    await api.put(`/api/blogs/${recieved.body.id}`).send({ ...blogToPost, url: 'Updated Url', userId })
     const updated = await api.get(`/api/blogs/${recieved.body.id}`)
     expect(updated.body[0].url).toEqual('Updated Url')
   })
   test('Updating likes', async () => {
+    const users = await helper.usersInDb()
+    const userId = users[0].id
     const recieved = await api.post('/api/blogs').send(blogToPost)
-    await api.put(`/api/blogs/${recieved.body.id}`).send({ ...blogToPost, likes: 55 })
+    await api.put(`/api/blogs/${recieved.body.id}`).send({ ...blogToPost, likes: 55, userId })
     const updated = await api.get(`/api/blogs/${recieved.body.id}`)
     expect(updated.body[0].likes).toEqual(55)
   })
