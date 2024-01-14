@@ -4,10 +4,13 @@ const app = require('../app')
 const api = supertest(app)
 const Blog = require('../models/blog')
 const helper = require('../tests/test_helper')
-
+const User = require('../models/user')
 beforeEach(async () => {
   await Blog.deleteMany({})
-  const blogObjects = helper.initialBlogs.map(blog => new Blog(blog))
+  const users = await helper.usersInDb()
+  const user = await User.findById(users[0].id)
+  console.log(`UserID: ${user}`)
+  const blogObjects = helper.initialBlogs.map(blog => new Blog({ ...blog, user }) )
   const promiseArray = blogObjects.map(blog => blog.save())
   await Promise.all(promiseArray)
 })
@@ -129,7 +132,7 @@ describe('delete a blog', () => {
 describe('Fetching a specific blog post', () => {
   test('fetching a blog that does not exist should give 404', async () => {
     const users = await helper.usersInDb()
-    const userId = users[0].id  
+    const userId = users[0].id
     const bogusPost = {
       author: 'Mr. W',
       title: 'Soon to be deleted',
@@ -162,45 +165,39 @@ describe('Updating blog', () => {
     title: 'Tests are a good idea',
     url: 'http://someurl.com',
   }
-  test('Updating a blog post that does not exist should create it', async () => {
+  test('Updating a blog post that does not exist should give error', async () => {
     const users = await helper.usersInDb()
     const userId = users[0].id
-    const recieved = await api.post('/api/blogs').send({...blogToPost, userId})
-    console.log(`Recieved test: ${recieved._body.id}`)
+    const recieved = await api.post('/api/blogs').send({ ...blogToPost, userId })
     await api.delete(`/api/blogs/${recieved._body.id}`)
-    await api.put(`/api/blogs/${recieved.body.id}`).send({ ...blogToPost,likes:2 }).expect(201)
+    await api.put(`/api/blogs/${recieved.body.id}`).send({ ...blogToPost,likes:2, userId }).expect(404)
   })
   test('Updating author', async () => {
-    const users = await helper.usersInDb()
-    const userId = users[0].id
-    const recieved = await api.post('/api/blogs').send(blogToPost)
-    console.log(`Recieved: ${Object.keys(recieved._body)}`)
-    await api.put(`/api/blogs/${recieved._body.id}`).send({ ...blogToPost, author:'Mr Y', userId })
-    const updated = await api.get(`/api/blogs/${recieved.body.id}`)
+    const blogs = await helper.blogsInDb()
+    const blogToUpdate = blogs[0]
+    await api.put(`/api/blogs/${blogToUpdate.id}`).send({ ...blogToUpdate, author:'Mr Y' })
+    const updated = await api.get(`/api/blogs/${blogToUpdate.id}`)
     expect(updated.body[0].author).toEqual('Mr Y')
   })
   test('Updating title', async () => {
-    const users = await helper.usersInDb()
-    const userId = users[0].id
-    const recieved = await api.post('/api/blogs').send(blogToPost)
-    await api.put(`/api/blogs/${recieved.body.id}`).send({ ...blogToPost, title: 'Updated Title', userId })
-    const updated = await api.get(`/api/blogs/${recieved.body.id}`)
+    const blogs = await helper.blogsInDb()
+    const blogToUpdate = blogs[0]
+    await api.put(`/api/blogs/${blogToUpdate.id}`).send({ ...blogToUpdate, title: 'Updated Title' })
+    const updated = await api.get(`/api/blogs/${blogToUpdate.id}`)
     expect(updated.body[0].title).toEqual('Updated Title')
   })
   test('Updating url', async () => {
-    const users = await helper.usersInDb()
-    const userId = users[0].id
-    const recieved = await api.post('/api/blogs').send(blogToPost)
-    await api.put(`/api/blogs/${recieved.body.id}`).send({ ...blogToPost, url: 'Updated Url', userId })
-    const updated = await api.get(`/api/blogs/${recieved.body.id}`)
+    const blogs = await helper.blogsInDb()
+    const blogToUpdate = blogs[0]
+    await api.put(`/api/blogs/${blogToUpdate.id}`).send({ ...blogToPost, url: 'Updated Url' })
+    const updated = await api.get(`/api/blogs/${blogToUpdate.id}`)
     expect(updated.body[0].url).toEqual('Updated Url')
   })
   test('Updating likes', async () => {
-    const users = await helper.usersInDb()
-    const userId = users[0].id
-    const recieved = await api.post('/api/blogs').send(blogToPost)
-    await api.put(`/api/blogs/${recieved.body.id}`).send({ ...blogToPost, likes: 55, userId })
-    const updated = await api.get(`/api/blogs/${recieved.body.id}`)
+    const blogs = await helper.blogsInDb()
+    const blogToUpdate = blogs[0]
+    await api.put(`/api/blogs/${blogToUpdate.id}`).send({ ...blogToPost, likes: 55 })
+    const updated = await api.get(`/api/blogs/${blogToUpdate.id}`)
     expect(updated.body[0].likes).toEqual(55)
   })
 })
