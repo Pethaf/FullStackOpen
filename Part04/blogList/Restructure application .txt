@@ -1,0 +1,97 @@
+Restructure application 
+index.js 
+app.js 
+DIST
+    ...
+CONTROLLERS 
+    notes.js 
+MODELS 
+    note.js
+package-lock.json 
+package.json 
+utils 
+    config.js
+    logger.js 
+    middleware.js 
+
+logger.js 
+const info = (...params) => {
+  console.log(...params)
+}
+
+const error = (...params) => {
+  console.error(...params)
+}
+
+module.exports = {
+  info, error
+}
+
+utils/config.js 
+
+require('dotenv').config()
+
+const PORT = process.env.PORT
+const MONGODB_URI = process.env.MONGODB_URI
+
+module.exports = {
+  MONGODB_URI,
+  PORT
+}
+
+const config = require('./utils/config')
+
+logger.info(`Server running on port ${config.PORT}`)
+
+The route handlers have also been moved into a dedicated module. The event handlers of routes are commonly referred to as controllers, and for this reason we have created a new controllers directory. All of the routes related to notes are now in the notes.js module under the controllers directory.
+
+notes.js 
+This is almost an exact copy-paste of our previous index.js file.
+
+However, there are a few significant changes. At the very beginning of the file we create a new router object:
+
+const notesRouter = require('express').Router()
+
+//...
+
+module.exports = notesRoutercopy
+The module exports the router to be available for all consumers of the module.
+
+All routes are now defined for the router object, similar to what I did before with the object representing the entire application.
+
+It's worth noting that the paths in the route handlers have shortened. In the previous version, we had:
+
+app.delete('/api/notes/:id', (request, response) => {copy
+And in the current version, we have:
+
+notesRouter.delete('/:id', (request, response) => {
+
+The app.js file that creates the actual application takes the router into use as shown below:
+
+const notesRouter = require('./controllers/notes')
+app.use('/api/notes', notesRouter)
+
+The router we defined earlier is used if the URL of the request starts with /api/notes. For this reason, the notesRouter object must only define the relative parts of the routes, i.e. the empty path / or just the parameter /:id.
+
+After making these changes, our app.js file looks like this:
+
+The responsibility of establishing the connection to the database has been given to the app.js module. The note.js file under the models directory only defines the Mongoose schema for notes.
+
+Let's define the npm script test to execute tests with Jest and to report about the test execution with the verbose style:
+
+    "test": "jest --verbose"
+Jest requires one to specify that the execution environment is Node. This can be done by adding the following to the end of package.json:
+
+ {
+ //...
+ "jest": {
+   "testEnvironment": "node"
+ }
+} 
+
+
+Individual test cases are defined with the test function. The first parameter of the function is the test description as a string. The second parameter is a function, that defines the functionality for the test case. The functionality for the second test case looks like this:
+
+
+Jest expects by default that the names of test files contain .test. In this course, we will follow the convention of naming our tests files with the extension .test.js.
+
