@@ -5,9 +5,9 @@ if (process.argv.length < 3) {
 }
 const password = process.argv[2];
 const clientOptions = { serverApi: { version: '1', strict: true, deprecationErrors: true } };
-const url = `mongodb://fullstack:${password}@cluster0.cah2bcd.mongodb.net/testDB?retryWrites=true&w=majority`;
+const url = `mongodb+srv://fullstack:${password}@cluster0.cah2bcd.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 mongoose
-  .connect(uri, clientOptions)
+  .connect(url, clientOptions)
   .then(() => {
     console.log("Connected to MongoDB");
 
