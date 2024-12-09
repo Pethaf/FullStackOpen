@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const uri = "mongodb+srv://fullstack:e7XGhMCPhn4BT1nX@cluster0.cah2bcd.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 if (process.argv.length < 3) {
   console.log("Please provide password as an argument.");
   process.exit(1);
