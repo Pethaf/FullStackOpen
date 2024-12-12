@@ -82,7 +82,6 @@ app.put("/api/persons/:id", (request, response, next) => {
   if (!number) {
     return response.status(422).json({ error: "Please include a new number" });
   }
-
   Person.findByIdAndUpdate(request.params.id, { number }, { new: true })
     .then((updatedPerson) => {
       if (updatedPerson) {
