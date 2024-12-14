@@ -26,6 +26,7 @@ app.use(express.static("dist"));
 app.get("/", (request, response) => {
   response.send("Backend API, please use specified urls");
 });
+
 app.get("/api/persons", (request, response) => {
   Person.find({}).then((persons) => response.json(persons));
 });
@@ -45,6 +46,7 @@ app.get("/api/persons/:id", (request, response, next) => {
       next(error);
     });
 });
+
 app.delete("/api/persons/:id", (request, response, next) => {
   Person.findByIdAndDelete(request.params.id)
     .then((result) => {
@@ -91,6 +93,13 @@ app.put("/api/persons/:id", (request, response, next) => {
       }
     })
     .catch((error) => next(error));
+});
+
+app.get("/info", (request, response) => {
+  Person.countDocuments().then((result) =>
+    response.send(`<p>Phonebook has info for ${result} people</p>
+			<p>${new Date()}</p>`)
+  );
 });
 app.use(unknownEndpoint);
 app.use(errorHandler);
