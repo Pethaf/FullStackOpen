@@ -49,57 +49,67 @@ const App = () => {
   const handleChangeName = (e) => {
     setNewName(e.target.value);
   };
-  const handleAddNewName = (e) => {
-    e.preventDefault();
-    if (persons.find((person) => person.name === newName)) {
-      if (
-        window.confirm(
-          `${newName} is already in phonebook replace old number with new one?`
-        )
-      ) {
-        const updatedPerson = {
-          ...persons.find(
-            (person) => person.name.toLowerCase() === newName.toLowerCase()
-          ),
-          number: newNumber,
-        };
-        peopleService
-          .updatePerson(updatedPerson)
-          .then((resp) => {
-            if (resp.status === 200) {
-              handleSuccessMessage(`${updatedPerson.name} updated succesfully`);
-              peopleService.getAll().then((resp) => {
-                if (resp.status === 200) {
-                  setPersons(resp.data);
-                  setNewName("");
-                  setNewNumber("");
-                }
-              });
-            }
-          })
-          .catch((_) => {
-            handleFailureMessage("Something went wrong");
-          });
-      }
-    } else {
-      peopleService
-        .create({
-          name: newName,
-          number: newNumber,
-        })
-        .then((resp) => {
-          if (resp.status === 200) {
-            handleSuccessMessage(`${newName} created successfully `);
-            peopleService.getAll().then((resp) => setPersons([...resp.data]));
+
+  const handleAddNewPerson = () => {
+    peopleService
+      .createPerson({ name: `${newName}`, number: `${newNumber}` })
+      .then((resp) => {
+        if (resp.status === 200) {
+          handleSuccessMessage(`${newName} successfully added`);
+          peopleService.getAll().then((resp) => {
+            setPersons(resp.data);
             setNewName("");
             setNewNumber("");
+          });
+        }
+      })
+      .catch((error) => {
+        console.log(error.response.data.error);
+        handleFailureMessage(error.response.data.error);
+      });
+  };
+
+  const handleUpdatePerson = (personToUpdate) => {
+    if (
+      window.confirm(
+        `${personToUpdate.name} is already in phonebook replace old number with new one?`
+      )
+    ) {
+      const newPerson = {
+        ...personToUpdate, 
+        number: `${newNumber}`
+      }
+      peopleService
+        .updatePerson(newPerson)
+        .then((resp) => {
+          if (resp.status === 200) {
+            handleSuccessMessage(`${newPerson.name.trim()} updated succesfully`);
+            peopleService.getAll().then((resp) => {
+              if (resp.status === 200) {
+                setPersons(resp.data);
+                setNewName("");
+                setNewNumber("");
+              }
+            });
           }
         })
-        .catch((_) => {
-          handleFailureMessage("Something went wrong");
+        .catch((error) => {
+          console.log(error.response.data.error);
+          handleFailureMessage(error.response.data.error);
         });
     }
   };
+
+  const handleAddNewName = (e) => {
+    e.preventDefault();
+    const oldPerson = persons.find((person) => person.name.toLowerCase() === newName.trim().toLowerCase())
+    if (oldPerson) {
+      handleUpdatePerson(oldPerson);
+    } else {
+      handleAddNewPerson();
+    }
+  };
+
   const handleChangeNumber = (e) => {
     setNewNumber(e.target.value);
   };
@@ -134,7 +144,7 @@ const App = () => {
         handleChangeNumber={handleChangeNumber}
       />
       <h2>Numbers</h2>
-      <Persons Persons={peopleToDisplay} deletePerson={deletePerson} />
+      <Persons persons={peopleToDisplay} deletePerson={deletePerson} />
     </div>
   );
 };

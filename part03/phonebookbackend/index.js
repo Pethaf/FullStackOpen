@@ -18,6 +18,9 @@ const errorHandler = (error, request, response, next) => {
   if (error.name === "CastError") {
     return response.status(400).send({ error: "malformatted id" });
   }
+  if (error.name === "ValidationError") {
+    return response.status(400).send({ error: error.message });
+  }
 
   next(error);
 };
@@ -61,11 +64,6 @@ app.delete("/api/persons/:id", (request, response, next) => {
 
 app.post("/api/persons", (request, response, next) => {
   const personToCreate = request.body;
-  if (!personToCreate.name?.trim() || !personToCreate.number?.trim()) {
-    return response.status(422).json({
-      error: "Name and number cannot be empty or whitespace",
-    });
-  }
   const newPerson = new Person({
     name: personToCreate.name.trim(),
     number: personToCreate.number.trim(),
@@ -74,17 +72,14 @@ app.post("/api/persons", (request, response, next) => {
     .save()
     .then((savedPerson) => response.json(savedPerson))
     .catch((error) => {
+      console.log(error.response);
       next(error);
     });
 });
 
 app.put("/api/persons/:id", (request, response, next) => {
   const { number } = request.body;
-
-  if (!number) {
-    return response.status(422).json({ error: "Please include a new number" });
-  }
-  Person.findByIdAndUpdate(request.params.id, { number }, { new: true })
+  Person.findByIdAndUpdate(request.params.id, { number }, { new: true, runValidators: true })
     .then((updatedPerson) => {
       if (updatedPerson) {
         response.json(updatedPerson);
@@ -92,7 +87,9 @@ app.put("/api/persons/:id", (request, response, next) => {
         response.status(404).json({ error: "Person not found" });
       }
     })
-    .catch((error) => next(error));
+    .catch((error) => {
+      next(error);
+    });
 });
 
 app.get("/info", (request, response) => {

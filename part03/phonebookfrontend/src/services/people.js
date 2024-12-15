@@ -4,7 +4,7 @@ const getAll = () => {
     return axios.get(baseUrl)
 }
 
-const create = newPerson => {
+const createPerson = newPerson => {
     return axios.post(baseUrl,newPerson)
 }
 const deletePerson = (personId) =>{
@@ -15,5 +15,5 @@ const updatePerson = (updatedPerson) => {
     return axios.put(`${baseUrl}${updatedPerson.id}`,updatedPerson)
 }
 export default {
-    getAll, create, deletePerson,updatePerson
+    getAll, createPerson, deletePerson,updatePerson
 }

@@ -1,8 +1,8 @@
 import React from "react";
 import { Person } from "./Person";
-export const Persons = ({Persons,deletePerson}) => {
+export const Persons = ({persons,deletePerson}) => {
     return <ul>
-        {Persons.map((person) => (
+        {persons.map((person) => (
           <Person key={person.id} {...person} deletePerson={deletePerson} />
         ))}
       </ul>
