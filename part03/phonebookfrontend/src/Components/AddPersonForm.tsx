@@ -5,11 +5,11 @@ export const AddPersonForm = ({handleAddNewName, newName, handleChangeName, newN
     <h2>Add a new</h2>
     <form onSubmit={handleAddNewName}>
       <div>
-        name: <input value={newName} onChange={handleChangeName} />
+        name: <input type="text" value={newName} onChange={handleChangeName} />
       </div>
       <div>
         number:{" "}
-        <input type="number" value={newNumber} onChange={handleChangeNumber} />
+        <input type="text" value={newNumber} onChange={handleChangeNumber} />
       </div>
       <div>
         <button type="submit">add</button>

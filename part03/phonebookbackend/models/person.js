@@ -14,6 +14,7 @@ mongoose
 
 const personSchema = new mongoose.Schema({
   name: {
+    unique: true,
     type: String,
     trim: true, 
     minLength: [3, "Name must be at least 3 characters long"],
@@ -22,7 +23,15 @@ const personSchema = new mongoose.Schema({
   number: {
     type: String, 
     trim: true, 
-    required: [true, "Number must be present"]
+    required: [true, "Number must be present"], 
+    minLength: 8, 
+    validate: {
+      validator: function(v) {
+        return /^\d{2,3}-\d{5,}$/.test(v);
+      },
+      message: props => `${props.value} is not a valid phone number!`
+    },
+
   }
 });
 
