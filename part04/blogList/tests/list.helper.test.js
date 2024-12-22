@@ -1,4 +1,4 @@
-const { listWithOneBlog,listWithTwoBlogs, listWithMultipleBlogs, blogWithMostLikes } = require('../assets/blogList');
+const { listWithOneBlog,listWithTwoBlogs, listWithMultipleBlogs, blogWithMostLikes,authorWithMostPosts } = require('../assets/blogList');
 const { test, describe } = require("node:test");
 const assert = require("node:assert");
 const listHelper = require("../utils/list_helper");
@@ -30,5 +30,13 @@ describe('favourite blog' , () => {
   test("Finds blog with most likes", () => {
     const result = listHelper.favoriteBlog(listWithMultipleBlogs)
     assert.deepStrictEqual(result, blogWithMostLikes)
+  })
+})
+
+describe("Most blogposts", () => {
+  test("Find author with most blog posts", () => {
+    const result = listHelper.mostBlogs(listWithMultipleBlogs)
+    console.log(result)
+    assert.deepStrictEqual(result, authorWithMostPosts)
   })
 })
