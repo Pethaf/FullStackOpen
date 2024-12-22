@@ -39,9 +39,32 @@ const mostBlogs = (posts) => {
   return { author: topAuthor, blogs: maxBlogs };
 };
 
+const mostLikes = (posts) => {
+  let blogsAndAuthors = {};
+  posts.forEach((post) => {
+    if (Object.hasOwn(blogsAndAuthors, post.author)) {
+      blogsAndAuthors[post.author] += post.likes;
+    } else {
+      blogsAndAuthors[post.author] = post.likes;
+    }
+  });
+
+  let maxLikes = 0;
+  let topAuthor = null;
+
+  for (const [author, likes] of Object.entries(blogsAndAuthors)) {
+    if(likes > maxLikes) {
+      maxLikes = likes;
+      topAuthor = author;
+    }
+  }
+  return { author: topAuthor, likes: maxLikes };
+};
+
 module.exports = {
   dummy,
   totalLikes,
   favoriteBlog,
   mostBlogs,
+  mostLikes,
 };

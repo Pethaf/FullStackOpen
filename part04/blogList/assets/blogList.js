@@ -92,10 +92,16 @@ const authorWithMostPosts = {
   blogs: 3,
 };
 
+const authorWithMostLikes = {
+  author: "Edsger W. Dijkstra",
+  likes: 17,
+};
+
 module.exports = {
   listWithOneBlog,
   listWithTwoBlogs,
   listWithMultipleBlogs,
   blogWithMostLikes,
-  authorWithMostPosts
+  authorWithMostPosts,
+  authorWithMostLikes
 };
