@@ -1,6 +1,7 @@
 const config = require("./utils/config");
 const express = require("express");
 const supertest = require('supertest')
+require('express-async-errors')
 const app = express();
 const api = supertest(app)
 const cors = require("cors");
