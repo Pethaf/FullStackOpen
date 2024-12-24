@@ -38,19 +38,28 @@ test("Returned blogposts have field named id not _id", async () => {
 
 test("Valid blog post can be posted", async () => {
   const blogPost = new Blog({
-    "author": "Mr. G",
-    "url": "http://www.google.com",
-    "likes": 2,
-  })
-  const savedBlog = await blogPost.save()
-  const response = await api.get("/api/blogs")
-  assert.deepEqual(response.body.length, listWithMultipleBlogs.length+1)
-  for(const prop of Object.keys(blogPost)){
-    assert.deepEqual(savedBlog[prop], blogPost[prop])
+    author: "Mr. G",
+    url: "http://www.google.com",
+    likes: 2,
+  });
+  const savedBlog = await blogPost.save();
+  const response = await api.get("/api/blogs");
+  assert.deepEqual(response.body.length, listWithMultipleBlogs.length + 1);
+  for (const prop of Object.keys(blogPost)) {
+    assert.deepEqual(savedBlog[prop], blogPost[prop]);
   }
-  assert.hasOwnProperty(savedBlog["id"])
-})
+  assert.hasOwnProperty(savedBlog["id"]);
+});
+
+test("Blog post value likes defaults to 0", async () => {
+  const blogPost = new Blog({
+    author: "Mr.X",
+    url: "http://www.google.com",
+  });
+  const savedBlog = await blogPost.save();
+  assert.deepEqual(savedBlog.likes, 0)
+});
 
 after(async () => {
-  await mongoose.connection.close()
-})
+  await mongoose.connection.close();
+});
