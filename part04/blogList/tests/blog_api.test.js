@@ -37,28 +37,52 @@ test("Returned blogposts have field named id not _id", async () => {
 });
 
 test("Valid blog post can be posted", async () => {
-  const blogPost = new Blog({
-    author: "Mr. G",
-    url: "http://www.google.com",
+  const blog = {
+    title: "Test",
+    author: "Mr.X",
+    url: "http://google.com",
     likes: 2,
-  });
-  const savedBlog = await blogPost.save();
+  };
+  const savedBlog = await api.post("/api/blogs").send(blog).expect(201);
+
   const response = await api.get("/api/blogs");
+
   assert.deepEqual(response.body.length, listWithMultipleBlogs.length + 1);
-  for (const prop of Object.keys(blogPost)) {
-    assert.deepEqual(savedBlog[prop], blogPost[prop]);
+  for (const prop of Object.keys(blog)) {
+    assert.deepEqual(savedBlog.body[prop], blog[prop]);
   }
-  assert.hasOwnProperty(savedBlog["id"]);
+  assert.hasOwnProperty(savedBlog.body["id"]);
+});
+test("Blog post value likes defaults to 0", async () => {
+  const blog = {
+    author: "Mr.Y",
+    title: "Test",
+    url: "http://www.google.com",
+  };
+  const savedBlog = await api.post("/api/blogs").send(blog).expect(201);
+  assert.deepEqual(savedBlog.body.likes, 0);
 });
 
-test("Blog post value likes defaults to 0", async () => {
-  const blogPost = new Blog({
-    author: "Mr.X",
-    url: "http://www.google.com",
-  });
-  const savedBlog = await blogPost.save();
-  assert.deepEqual(savedBlog.likes, 0)
+test("Blog post without title won't get posted", async () => {
+  const newBlog = {
+    name: "Test",
+    url: "http://google.com",
+    likes: 4,
+  };
+  const savedBlog = await api.post("/api/blogs").send(newBlog).expect(400);
+  const blogs = await api.get("/api/blogs")
+  assert.deepEqual(blogs.body.length, listWithMultipleBlogs.length)
 });
+
+test("Blog post without url won't get posted", async () => {
+  const newBlog = {
+    name: "Test",
+    author: "Mr. Y",
+  }
+  const savedBlog = await api.post("/api/blogs").send(newBlog).expect(400);
+  const blogs = await api.get("/api/blogs")
+  assert.deepEqual(blogs.body.length, listWithMultipleBlogs.length)
+})
 
 after(async () => {
   await mongoose.connection.close();
