@@ -20,7 +20,18 @@ test("blogs are returned as json", async () => {
     .expect("Content-Type", /application\/json/);
 });
 
-test('Correct number of blogs in db', async () => {
-    const response = await api.get("/api/blogs")
-    assert.strictEqual(response.body.length, listWithMultipleBlogs.length)
-})
+test("Correct number of blogs in db", async () => {
+  const response = await api.get("/api/blogs");
+  assert.strictEqual(response.body.length, listWithMultipleBlogs.length);
+});
+
+test("Returned blogposts have field named id not _id", async () => {
+  const response = await api.get("/api/blogs").expect(200);
+  assert.ok(
+    Array.isArray(response.body),
+    response.body.forEach((item) => {
+      assert.ok(item.hasOwnProperty("id"), "Item is missing 'id' field");
+      assert.ok(!item.hasOwnProperty("_id"));
+    })
+  );
+});
