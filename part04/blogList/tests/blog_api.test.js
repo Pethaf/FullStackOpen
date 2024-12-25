@@ -104,8 +104,8 @@ describe("Deleting blogs", async () => {
     await api.delete(`/api/blogs/${savedBlog.body.id}`).expect(200);
     const blogsAfterDeleting = await api.get("/api/blogs");
     assert.strictEqual(
-     blogsBeforeDeleting.body.length,
-     blogsAfterDeleting.body.length + 1
+      blogsBeforeDeleting.body.length,
+      blogsAfterDeleting.body.length + 1
     );
     assert.ok(
       Array.isArray(blogsAfterDeleting.body),
@@ -113,6 +113,32 @@ describe("Deleting blogs", async () => {
         assert.ok(item._id !== savedBlog.body.id);
       })
     );
+  });
+});
+
+describe("Updating blog", async () => {
+  test("Updating blog works", async () => {
+    const blogToUpdate = {
+      author: "Mr.Y",
+      title: "Change Me",
+      url: "http://changeme.com",
+    };
+    const savedBlog = 
+    await api
+    .post("/api/blogs")
+    .send(blogToUpdate).expect(201)
+   
+    const updatedBlog = {
+      author: "Mr. Z",
+      title: "Changed Me",
+      url: "http://changedme.com",
+      id: `${savedBlog.body.id}`,
+      likes: 2 
+    }
+    await api.put(`/api/blogs/${savedBlog.body.id}`).send(updatedBlog).expect(200)
+    const blogList = await api.get("/api/blogs")
+    const changedBlogFromDB = blogList.body.find(blog => blog.id === updatedBlog.id)
+    assert.deepEqual(updatedBlog, changedBlogFromDB)  
   });
 });
 
