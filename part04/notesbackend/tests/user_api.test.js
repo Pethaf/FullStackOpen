@@ -33,7 +33,7 @@ describe("When there is initially one user in the db", async () => {
     const usernames = usersAtEnd.map((u) => u.username);
     assert(usernames.includes(newUser.username));
   });
-  test("creation fails with proper statuscode and message if username already taken", async () => {
+  test("creation fails with proper status code and message if username already taken", async () => {
     const usersAtStart = await helper.usersInDb();
 
     const newUser = {
@@ -54,3 +54,7 @@ describe("When there is initially one user in the db", async () => {
     assert.strictEqual(usersAtEnd.length, usersAtStart.length);
   });
 });
+
+after(async () => {
+  await mongoose.connection.close()
+})
