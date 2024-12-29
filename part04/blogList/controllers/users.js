@@ -1,27 +1,27 @@
 const userRouter = require("express").Router();
 const { response } = require("express");
 const User = require("../models/user");
-const bcrypt = require("bcrypt")
+const bcrypt = require("bcrypt");
 userRouter.get("/", async (request, response) => {
   const users = await User.find({});
   response.json(users);
 });
 userRouter.post("/", async (request, response) => {
   const { username, name, password } = request.body;
-  if (!username || !password) {
+  console.log(username, name, password);
+ if (password.length < 3) {
     return response
-      .status(400)
-      .json({ error: "Username and password are required" });
-  } else if (password.length < 3) {
+      .status(422)
+      .json({ error: "password must be at least 3 characters long" });
+  } else if (username.length < 3) {
     return response
-      .status(400)
-      .json({ error: "password needs to be at least 3 characters long" });
+      .status(422)
+      .json({ error: "username must be at least 3 characters longs" });
   }
   const saltRounds = 10;
   try {
     console.log("Hashing password...");
     const passwordHash = await bcrypt.hash(password, saltRounds);
-
     console.log("Creating new user...");
     const user = new User({
       username,
@@ -35,9 +35,18 @@ userRouter.post("/", async (request, response) => {
     response.status(201).json(savedUser);
   } catch (error) {
     console.error("Error during user creation:", error);
-    response
-      .status(500)
-      .json({ error: "Internal Server Error: " + error.message });
+    if (
+      error.name === "MongoServerError" &&
+      error.message.includes("E11000 duplicate key error")
+    ) {
+      response.status(409).json({
+        error: "error: 'expected `username` to be unique",
+      });
+    } else {
+      response
+        .status(500)
+        .json({ error: "Internal Server Error: " + error.message });
+    }
   }
 });
 

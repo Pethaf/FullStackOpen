@@ -1,3 +1,4 @@
+const { User } = require("../models/user")
 const dummy = (blogs) => {
   return 1;
 };
@@ -18,48 +19,39 @@ const favoriteBlog = (posts) => {
 };
 
 const mostBlogs = (posts) => {
-  let blogsAndAuthors = {};
-  posts.forEach((post) => {
-    if (Object.hasOwn(blogsAndAuthors, post.author)) {
-      blogsAndAuthors[post.author] += 1;
-    } else {
-      blogsAndAuthors[post.author] = 1;
-    }
+  if (posts.length === 0) return null;
+
+  const authorBlogCounts = posts.reduce((counts, post) => {
+    counts[post.author] = (counts[post.author] || 0) + 1;
+    return counts;
+  }, {});
+
+  const topAuthor = Object.keys(authorBlogCounts).reduce((top, author) => {
+    return authorBlogCounts[author] > authorBlogCounts[top] ? author : top;
   });
 
-  let maxBlogs = 0;
-  let topAuthor = null;
-
-  for (const [author, blogs] of Object.entries(blogsAndAuthors)) {
-    if (blogs > maxBlogs) {
-      maxBlogs = blogs;
-      topAuthor = author;
-    }
-  }
-  return { author: topAuthor, blogs: maxBlogs };
+  return { author: topAuthor, blogs: authorBlogCounts[topAuthor] };
 };
 
 const mostLikes = (posts) => {
-  let blogsAndAuthors = {};
-  posts.forEach((post) => {
-    if (Object.hasOwn(blogsAndAuthors, post.author)) {
-      blogsAndAuthors[post.author] += post.likes;
-    } else {
-      blogsAndAuthors[post.author] = post.likes;
-    }
+  if (posts.length === 0) return null;
+
+  const authorLikeCounts = posts.reduce((counts, post) => {
+    counts[post.author] = (counts[post.author] || 0) + post.likes;
+    return counts;
+  }, {});
+
+  const topAuthor = Object.keys(authorLikeCounts).reduce((top, author) => {
+    return authorLikeCounts[author] > authorLikeCounts[top] ? author : top;
   });
 
-  let maxLikes = 0;
-  let topAuthor = null;
-
-  for (const [author, likes] of Object.entries(blogsAndAuthors)) {
-    if(likes > maxLikes) {
-      maxLikes = likes;
-      topAuthor = author;
-    }
-  }
-  return { author: topAuthor, likes: maxLikes };
+  return { author: topAuthor, likes: authorLikeCounts[topAuthor] };
 };
+
+const usersInDb = async () => {
+  const users = await User.find({})
+  return users.map((u) => u.toJSON())
+}
 
 module.exports = {
   dummy,
@@ -67,4 +59,5 @@ module.exports = {
   favoriteBlog,
   mostBlogs,
   mostLikes,
+  usersInDb
 };

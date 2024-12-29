@@ -18,6 +18,50 @@ describe("Getting empty user list", async () => {
   });
 });
 describe("Creating User", async () => {
+  test("Adding a user with an empty username", async () => {
+    const usersInDbBefore = await api.get("/api/users");
+    const newUser = {
+      name: "z",
+      username: "",
+      password: "really long and complicated password",
+    };
+    const savedUser = await api.post("/api/users").send(newUser).expect(422);
+    const usersInDbAfter = await api.get("/api/users");
+    assert.deepStrictEqual(usersInDbAfter.length, usersInDbBefore.length);
+  })
+  test("Adding a user with an empty password", async () => {
+    const usersInDbBefore = await api.get("/api/users");
+    const newUser = {
+      name: "z",
+      username: "dsdsfsd",
+      password: "",
+    };
+    const savedUser = await api.post("/api/users").send(newUser).expect(422);
+    const usersInDbAfter = await api.get("/api/users");
+    assert.deepStrictEqual(usersInDbAfter.length, usersInDbBefore.length);
+  })
+  test("Adding a user with a username shorter than 3 letters", async () => {
+    const usersInDbBefore = await api.get("/api/users");
+    const newUser = {
+      name: "z",
+      username: "Mr",
+      password: "really long and complicated password",
+    };
+    const savedUser = await api.post("/api/users").send(newUser).expect(422);
+    const usersInDbAfter = await api.get("/api/users");
+    assert.deepStrictEqual(usersInDbAfter.length, usersInDbBefore.length);
+  });
+  test("Adding a user with a password shorter than 3 letters", async () => {
+    const usersInDbBefore = await api.get("/api/users");
+    const newUser = {
+      name: "z",
+      username: "Mr.Z",
+      password: "re",
+    };
+    const savedUser = await api.post("/api/users").send(newUser).expect(422);
+    const usersInDbAfter = await api.get("/api/users");
+    assert.deepStrictEqual(usersInDbAfter.length, usersInDbBefore.length);
+  });
   test("Adding a unique user to the database", async () => {
     const usersInDatabaseBeforeAdding = await api.get("/api/users");
     const newUser = {
