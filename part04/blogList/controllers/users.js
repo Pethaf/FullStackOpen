@@ -3,9 +3,16 @@ const { response } = require("express");
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
 userRouter.get("/", async (request, response) => {
-  const users = await User.find({});
+  const users = await User.find({}).populate('posts', {title: 1, author: 1, url: 1 })
   response.json(users);
 });
+userRouter.get("/:id", async (request, response) => {
+  const user = await User.findById(request.params.id)
+  if(!user){
+    response.status(404).json({error: "User id not found"})
+  }
+    response.send(user)
+})
 userRouter.post("/", async (request, response) => {
   const { username, name, password } = request.body;
   console.log(username, name, password);

@@ -8,7 +8,7 @@ const User = require("../models/user");
 before(async () => {
   await User.deleteMany({});
 });
-describe("Getting empty user list", async () => {
+describe("Getting empty user list", () => {
   test("Asking for users", async () => {
     const users = await api
       .get("/api/users")
@@ -17,7 +17,7 @@ describe("Getting empty user list", async () => {
     assert.strictEqual(users.body.length, 0);
   });
 });
-describe("Creating User", async () => {
+describe("Creating User", () => {
   test("Adding a user with an empty username", async () => {
     const usersInDbBefore = await api.get("/api/users");
     const newUser = {
@@ -28,7 +28,7 @@ describe("Creating User", async () => {
     const savedUser = await api.post("/api/users").send(newUser).expect(422);
     const usersInDbAfter = await api.get("/api/users");
     assert.deepStrictEqual(usersInDbAfter.length, usersInDbBefore.length);
-  })
+  });
   test("Adding a user with an empty password", async () => {
     const usersInDbBefore = await api.get("/api/users");
     const newUser = {
@@ -39,7 +39,7 @@ describe("Creating User", async () => {
     const savedUser = await api.post("/api/users").send(newUser).expect(422);
     const usersInDbAfter = await api.get("/api/users");
     assert.deepStrictEqual(usersInDbAfter.length, usersInDbBefore.length);
-  })
+  });
   test("Adding a user with a username shorter than 3 letters", async () => {
     const usersInDbBefore = await api.get("/api/users");
     const newUser = {
@@ -75,6 +75,8 @@ describe("Creating User", async () => {
       usersInDatabaseAfterAdding.body.length,
       usersInDatabaseBeforeAdding.body.length + 1
     );
+    const user = await api.get(`/api/users/${createdUser.body.id}`).expect(200);
+    assert.equal(user.id, createdUser.id);
   });
   test("Adding a user that allready exists to database", async () => {
     const usersInDbBefore = await api.get("/api/users");
