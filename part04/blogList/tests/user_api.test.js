@@ -8,6 +8,9 @@ const User = require("../models/user");
 before(async () => {
   await User.deleteMany({});
 });
+
+
+
 describe("Getting empty user list", () => {
   test("Asking for users", async () => {
     const users = await api
@@ -93,3 +96,4 @@ describe("Creating User", () => {
 after(async () => {
   await mongoose.connection.close();
 });
+

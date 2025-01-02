@@ -29,6 +29,7 @@ beforeEach(async () => {
     likes: blog.likes,
     userId: postingUser.body.id,
   }));
+
   const promiseArray = blogObjects.map((blog) =>
     api.post("/api/blogs").send(blog)
   );
@@ -130,7 +131,7 @@ describe("Deleting blogs", () => {
     await api.delete(`/api/blogs/${savedBlog.body.id}`).expect(200);
     const blogsAfterDeleting = await api.get("/api/blogs");
     assert.strictEqual(
-      blogsBeforeDeleting.body.length-1,
+      blogsBeforeDeleting.body.length - 1,
       blogsAfterDeleting.body.length
     );
     assert.ok(
