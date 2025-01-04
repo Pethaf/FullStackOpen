@@ -5,6 +5,14 @@ const mongoose = require("mongoose");
 const app = require("../app");
 const api = supertest(app);
 const User = require("../models/user");
+const login = async (username, password, expectedStatus) => {
+    const response = await api
+      .post("/api/login")
+      .send({ username, password })
+      .expect(expectedStatus);
+    return response;
+  };
+
 before(async () => {
     await User.deleteMany() 
     const testUser = {
@@ -17,40 +25,24 @@ before(async () => {
 
 describe("Login", () => {
     test("User without password can't login", async() => {
-        const loginUser = {
-            username: "MrX",
-            password: ""
-        }
-        const loggedInUser = await api.post("/api/login").send(loginUser).expect(400)
+         const response = await login("MrX", "", 400);
+         assert.strictEqual(response.body.error, "Username and password are required");
     })
     test("User with without username can't login", async() => {
-        const loginUser = {
-            username: "",
-            password: "reallylongandcomplicatedpassword"
-        }
-        const loggedInUser = await api.post("/api/login").send(loginUser).expect(400)
+        const response = await login("","reallylongandcomplicatedpassword",400);
+        assert.strictEqual(response.body.error, "Username and password are required");
     })
     test("User with invalid password can't login", async () => {
-        const loginUser = {
-            username:"MrX",
-            password:"wrongpassword"
-        }
-        const loggedInUser = await api.post("/api/login").send(loginUser).expect(401)
+        const response = await login("MrX","wrongpassword",401)
+        assert.strictEqual(response.body.error, "Invalid username or password");
 
     })
     test("User with invalid username can't login", async () => {
-        const loginUser = {
-            username: "MrZ",
-            password:"reallylongandcomplicatedpassword"
-        }
-        const loggedInUser = await api.post("/api/login").send(loginUser).expect(401)
+        const response = await login("MrZ","reallylongandcomplicatedpassword",401)
+        assert.strictEqual(response.body.error, "Invalid username or password")
     })
     test("User with valid username and password can login", async () => {
-        const loginUser = {
-            username: "MrX",
-            password: "reallylongandcomplicatedpassword"
-        }
-        const logedinUser = await api.post  ("/api/login").send(loginUser).expect(200)
+        const logedinUser = await login("MrX","reallylongandcomplicatedpassword",200)
         assert.ok(logedinUser.body.token.startsWith("ey"), "Token should start with 'ey'");
     })
 })
