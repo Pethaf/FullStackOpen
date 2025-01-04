@@ -21,14 +21,14 @@ describe("Login", () => {
             username: "MrX",
             password: ""
         }
-        const loggedInUser = await api.post("/api/login").send(loginUser).expect(401)
+        const loggedInUser = await api.post("/api/login").send(loginUser).expect(400)
     })
     test("User with without username can't login", async() => {
         const loginUser = {
             username: "",
             password: "reallylongandcomplicatedpassword"
         }
-        const loggedInUser = await api.post("/api/login").send(loginUser).expect(401)
+        const loggedInUser = await api.post("/api/login").send(loginUser).expect(400)
     })
     test("User with valid username and password can login", async () => {
         const loginUser = {
