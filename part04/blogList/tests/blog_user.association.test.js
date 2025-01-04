@@ -26,10 +26,18 @@ describe("User posts blog", () => {
       author: "Mr.Z"
     }
     const savedBlog = await api.post("/api/blogs").send(newBlogPost).expect(201)
-    const blogFromDb = await api.get(`/api/blogs/${savedBlog.id}`)
-    console.log(blogFromDb)
-    assert.notEqual(blogFromDb.body.user,null )
-
+    assert.notEqual(savedBlog.body.user,null )
+  })
+  test("Making a blog post with a userid", async () => {
+    const secondNewBlogPost = {
+      title: "Second random post",
+      url: "Https://www.duckduckgo.com",
+      likes: "2",
+      author: `${postingUser.username}`,
+      user: `${postingUser.body.id}`
+    }
+    const savedBlog = await api.post("/api/blogs/").send(secondNewBlogPost).expect(201)
+    assert.strictEqual(savedBlog.body.user, postingUser.body.id)
   })
 })
 
