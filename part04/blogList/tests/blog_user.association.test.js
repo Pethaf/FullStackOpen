@@ -6,9 +6,16 @@ const app = require("../app");
 const api = supertest(app);
 const User = require("../models/user");
 const Blog = require("../models/blog");
+let postingUser
 before(async () => {
   await User.deleteMany({});
   await Blog.deleteMany({});
+  const newUser = {
+    username: "MrX",
+    name: "Mr.X",
+    password: "password"
+  }
+  postingUser = await api.post("/api/users/").send(newUser).expect(201)
 });
 describe("User posts blog", () => {
   test("Making a blog post without a userid", async () => {
@@ -20,6 +27,7 @@ describe("User posts blog", () => {
     }
     const savedBlog = await api.post("/api/blogs").send(newBlogPost).expect(201)
     const blogFromDb = await api.get(`/api/blogs/${savedBlog.id}`)
+    console.log(blogFromDb)
     assert.notEqual(blogFromDb.body.user,null )
 
   })
