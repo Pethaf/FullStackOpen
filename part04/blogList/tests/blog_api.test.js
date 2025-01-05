@@ -74,8 +74,16 @@ describe("Posting blogs", () => {
       })
     );
   });
-
-  test("Valid blog post can be posted", async () => {
+  test("Valid blog can't be posted if user doesn't have a valid JWT", async () => {
+    const blog = {
+      title: "Other Blog",
+      author: "Mr.X",
+      url: "http://google.com",
+      likes: 2
+    }
+    const savedBlog = await api.post("/api/blogs").send(blog).expect(401)
+  })
+  test("Valid blog post can be posted if user is logged in and has a valid JWT", async () => {
     const blog = {
       title: "Test",
       author: "Mr.X",
