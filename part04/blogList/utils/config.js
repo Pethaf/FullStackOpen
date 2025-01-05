@@ -1,5 +1,5 @@
 require("dotenv").config();
-
+JWT_EXPIRY_TIME = 3600
 const PORT = process.env.PORT;
 
 const MONGODB_URI =
@@ -10,4 +10,5 @@ const MONGODB_URI =
 module.exports = {
   MONGODB_URI,
   PORT,
+  JWT_EXPIRY_TIME
 };

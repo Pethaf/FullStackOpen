@@ -8,6 +8,12 @@ const api = supertest(app);
 const Blog = require("../models/blog");
 const User = require("../models/user");
 let postingUser;
+before(async () => {
+  await User.deleteMany();
+  await Blog.deleteMany();
+  postingUser = await api.post("/api/users").send(newUser).expect(201);
+});
+
 const newUser = {
   username: "Test",
   name: "MrX",
@@ -26,18 +32,11 @@ const postBlog = async (blog) => {
     .set("Authorization", `Bearer ${response.body.token}`)
     .send(blog);
 };
-
-before(async () => {
-  await User.deleteMany();
-  postingUser = await api.post("/api/users").send(newUser).expect(201);
-});
 beforeEach(async () => {
   await Blog.deleteMany({});
   if (!postingUser?.body?.id) {
     throw new Error("postingUser is not defined or lacks an ID");
   }
-  const response = await loginUser(newUser.username, newUser.password);
-
   const blogObjects = listWithMultipleBlogs.map((blog) => ({
     title: blog.title,
     author: blog.author,
@@ -65,7 +64,7 @@ describe("When there are blogs in the database", () => {
 
 describe("Posting blogs", () => {
   test("Returned blogposts have field named id not _id", async () => {
-    const response = await api.get("/api/blogs").expect(200);
+    const response = await api.get("/api/blogs").expect(200); 
     assert.ok(
       Array.isArray(response.body),
       response.body.forEach((item) => {
@@ -99,14 +98,15 @@ describe("Posting blogs", () => {
       assert.equal(blog["likes"], savedBlog.body["likes"]);
     assert.hasOwnProperty(savedBlog.body["id"]);
   });
-  test("Blog post value likes defaults to 0", async () => {
+ test("Blog post value likes defaults to 0", async () => {
     const blog = {
       author: "Mr.Y",
       title: "Test",
       url: "http://www.google.com",
     };
-    const savedBlog = await postBlog(blog).expect(201);
-    assert.deepEqual(savedBlog.body.likes, 0);
+    const savedBlogResponse = await postBlog(blog)
+    assert.strictEqual(savedBlogResponse.status, 201);
+    assert.strictEqual(savedBlogResponse.body.likes, 0);
   });
 
   test("Blog post without title won't get posted", async () => {
@@ -115,7 +115,8 @@ describe("Posting blogs", () => {
       url: "http://google.com",
       likes: 4,
     };
-    const savedBlog = await postBlog(newBlog).expect(400);
+    const savedBlogResponse = await postBlog(newBlog);
+    assert.strictEqual(savedBlogResponse.status,400)
     const blogs = await api.get("/api/blogs");
     assert.strictEqual(blogs.body.length, listWithMultipleBlogs.length);
   });
@@ -125,7 +126,8 @@ describe("Posting blogs", () => {
       name: "Test",
       author: "Mr. Y",
     };
-    const savedBlog = await postBlog(newBlog).expect(400);
+    const savedBlogResponse = await postBlog(newBlog);
+    assert.strictEqual(savedBlogResponse.status, 400)
     const blogs = await api.get("/api/blogs");
     assert.strictEqual(blogs.body.length, listWithMultipleBlogs.length);
   });
@@ -169,7 +171,8 @@ describe("Updating blog", () => {
       title: "Change Me",
       url: "http://changeme.com",
     };
-    const savedBlog = await postBlog(blogToUpdate).expect(201);
+    const savedBlog = await postBlog(blogToUpdate)
+    assert.strictEqual(savedBlog.status, 201)
     const updatedBlog = {
       author: "Mr. Z",
       title: "Changed Me",
