@@ -2,38 +2,20 @@ const blogRouter = require("express").Router();
 const { response } = require("express");
 const Blog = require("../models/blog");
 const User = require("../models/user");
-const jwt = require("jsonwebtoken");
-const getTokenFrom = (request) => {
-  const authorization = request.get("authorization");
-  if (authorization && authorization.startsWith("Bearer ")) {
-    return authorization.replace("Bearer ", "");
-  }
-  return null;
-};
-
+const { userExtractor } = require("../utils/middleware");
 blogRouter.get("/", async (request, response) => {
   const blogs = await Blog.find({}).populate("user", {
     username: 1,
     name: 1,
     id: 1,
   });
-  response.send(blogs);
+  response.json(blogs);
 });
 
-blogRouter.post("/", async (request, response) => {
-  const token = getTokenFrom(request);
-  console.log("token:", token);
-  if (!token) {
-    return response.status(401).json({ error: "no token" });
-  }
-  const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET);
-  console.log("Decoded token:", decodedToken);
-  if (!decodedToken.id) {
-    return response.status(401).json({ error: "token invalid" });
-  }
-  const user = await User.findById(decodedToken.id);
-  if(!user){
-    response.status(404).end()
+blogRouter.post("/", userExtractor, async (request, response) => {
+  const user = await User.findById(request.userId);
+  if (!user) {
+    return response.status(404).json({ error: "User not found" });
   }
   const { title, author, url, likes } = request.body;
   const blog = new Blog({
@@ -48,7 +30,14 @@ blogRouter.post("/", async (request, response) => {
   await user.save();
   response.status(201).json(savedBlog);
 });
-blogRouter.put("/:id", async (request, response) => {
+blogRouter.put("/:id", userExtractor, async (request, response) => {
+  const blog = await Blog.findById(request.params.id);
+  if (!blog) {
+    return response.status(404).json({ error: "Blog not found" });
+  }
+  if (request.userId !== blog.user.toString()) {
+    response.status(403).json({ error: "Forbidden" });
+  }
   const updatedBlog = await Blog.findByIdAndUpdate(
     request.params.id,
     request.body,
@@ -57,13 +46,16 @@ blogRouter.put("/:id", async (request, response) => {
   response.send(updatedBlog);
 });
 
-blogRouter.delete("/:id", async (request, response) => {
-  console.log(request.params.id);
+blogRouter.delete("/:id", userExtractor, async (request, response) => {
   const blog = await Blog.findById(request.params.id);
   if (!blog) {
-    return response.status(204).end();
+    return response.status(404).json({ error: "Blog not found" });
   }
-  await Blog.findByIdAndDelete(request.params.id);
-  response.status(200).end();
+  if (request.userId === blog.user.id.toString()) {
+    await Blog.findByIdAndDelete(request.params.id);
+    response.status(200).json({ message: "Blog deleted successfully" });
+  } else {
+    response.status(403).json({ error: "Forbidden" });
+  }
 });
 module.exports = blogRouter;

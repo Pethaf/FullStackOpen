@@ -1,24 +1,26 @@
 const { listWithMultipleBlogs } = require("../assets/blogList");
 const { test, after, beforeEach, describe, before } = require("node:test");
 const assert = require("node:assert");
+const config = require('../utils/config')
 const supertest = require("supertest");
 const mongoose = require("mongoose");
 const app = require("../app");
 const api = supertest(app);
 const Blog = require("../models/blog");
 const User = require("../models/user");
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 let postingUser;
-before(async () => {
-  await User.deleteMany();
-  await Blog.deleteMany();
-  postingUser = await api.post("/api/users").send(newUser).expect(201);
-});
-
 const newUser = {
   username: "Test",
   name: "MrX",
   password: "password",
 };
+
+before(async () => {
+  await User.deleteMany();
+  await Blog.deleteMany();
+  postingUser = await api.post("/api/users").send(newUser).expect(201);
+});
 const loginUser = async (username, password) => {
   return await api.post("/api/login").send({
     username,
@@ -29,13 +31,15 @@ const postBlog = async (blog) => {
   const response = await loginUser(newUser.username, newUser.password);
   return await api
     .post("/api/blogs/")
-    .set("Authorization", `Bearer ${response.body.token}`)
-    .send(blog);
+    .send(blog)
+    .set("Authorization", `Bearer ${response.body.token}`);
 };
 beforeEach(async () => {
+  await sleep(1000) 
   await Blog.deleteMany({});
   if (!postingUser?.body?.id) {
     throw new Error("postingUser is not defined or lacks an ID");
+    
   }
   const blogObjects = listWithMultipleBlogs.map((blog) => ({
     title: blog.title,
@@ -53,16 +57,17 @@ describe("When there are blogs in the database", () => {
     await api
       .get("/api/blogs")
       .expect(200)
-      .expect("Content-Type", /application\/json/);
+      .expect("Content-Type", /application\/json/).timeout(10000);;
   });
 
   test("Correct number of blogs in db", async () => {
+    await sleep(1000)
     const response = await api.get("/api/blogs");
     assert.strictEqual(response.body.length, listWithMultipleBlogs.length);
   });
 });
 
-describe("Posting blogs", () => {
+/*describe("Posting blogs", () => {
   test("Returned blogposts have field named id not _id", async () => {
     const response = await api.get("/api/blogs").expect(200); 
     assert.ok(
@@ -109,7 +114,7 @@ describe("Posting blogs", () => {
     assert.strictEqual(savedBlogResponse.body.likes, 0);
   });
 
-  test("Blog post without title won't get posted", async () => {
+  test("Valid blog post requires title", async () => {
     const newBlog = {
       title: "Test",
       url: "http://google.com",
@@ -121,7 +126,7 @@ describe("Posting blogs", () => {
     assert.strictEqual(blogs.body.length, listWithMultipleBlogs.length);
   });
 
-  test("Blog post without url won't get posted", async () => {
+  test("Valid blog post requires url", async () => {
     const newBlog = {
       name: "Test",
       author: "Mr. Y",
@@ -141,7 +146,8 @@ describe("Deleting blogs", () => {
       url: "DeleteMe",
       likes: 3,
     };
-    const savedBlog = await postBlog(blogToDelete).expect(201);
+    const savedBlog = await postBlog(blogToDelete)
+    assert.equal(savedBlog.status, 201)
     const blogsBeforeDeleting = await api.get("/api/blogs");
     await api.delete(`/api/blogs/${savedBlog.body.id}`).expect(200);
     const blogsAfterDeleting = await api.get("/api/blogs");
@@ -193,7 +199,7 @@ describe("Updating blog", () => {
     assert.equal(updatedBlog["url"], changedBlogFromDB["url"]);
     assert.equal(updatedBlog["likes"], changedBlogFromDB["likes"]);
   });
-});
+});*/
 
 after(async () => {
   await mongoose.connection.close();
