@@ -7,6 +7,7 @@ const DisplayNotes = ({notes, toggleImportanceOf}) => {
     : notes.filter((note) => note.important);
     return (
         <>
+        <h2>Notes in Database</h2>
     <div>
         <button onClick={() => setShowAll(!showAll)}>
           show {showAll ? "important" : "all"}

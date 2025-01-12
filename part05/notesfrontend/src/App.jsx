@@ -87,15 +87,15 @@ const App = () => {
         />
       )}
       {token !== null && 
-      <>
-      <DisplayNotes notes = {notes} toggleImportanceOf={toggleImportanceOf} />
-      <h2>Add new note</h2>
+      <>      <h2>Add new note</h2>
       <form onSubmit={addNote}>
           <input value={newNote} onChange={handleNoteChange} />
           <button type="submit">save</button>
         </form>
       </>
       }
+            <DisplayNotes notes = {notes} toggleImportanceOf={toggleImportanceOf} />
+
     </div>
   )
 }
