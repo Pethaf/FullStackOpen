@@ -57,7 +57,7 @@ notesRouter.put("/:id", async (request, response, next) => {
     new: true,
   });
   if (Updatednote) {
-    response.json(note);
+    response.json(Updatednote);
   } else {
     response.status(404).end();
   }
