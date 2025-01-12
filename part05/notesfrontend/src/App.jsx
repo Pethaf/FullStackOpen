@@ -9,10 +9,9 @@ import DisplayNotes from "./Components/DisplayNotes";
 const App = () => {
   const [notes, setNotes] = useState([]);
   const [newNote, setNewNote] = useState("");
-  const [showAll, setShowAll] = useState(false);
   const [userName, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [token, setToken] = useState(null);
+  const [user, setUser] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
@@ -20,16 +19,24 @@ const App = () => {
       setNotes(initialNotes);
     });
   }, []);
-
+  useEffect(() => {
+    const userAsJSON = window.localStorage.getItem("loggedNoteappUser");
+    if (userAsJSON) {
+      const user = JSON.parse(userAsJSON);
+      setUser(user);
+      noteService.setToken(user.token);
+    }
+  }, []);
   const handleLogin = async (event) => {
     event.preventDefault();
-
     try {
       const user = await loginService.login({
         username: userName,
         password: password,
       });
-      setToken(user.token);
+      window.localStorage.setItem("loggedNoteappUser", JSON.stringify(user));
+      noteService.setToken(user.token);
+      setUser(user);
       setUsername("");
       setPassword("");
     } catch (exception) {
@@ -76,8 +83,8 @@ const App = () => {
     <div>
       <h1>Notes</h1>
 
-      {errorMessage !== null  && <NotifyFailure message={errorMessage} />}
-      {token === null &&  (
+      {errorMessage !== null && <NotifyFailure message={errorMessage} />}
+      {user === null && (
         <Login
           handleLogin={handleLogin}
           password={password}
@@ -86,18 +93,19 @@ const App = () => {
           updateUsername={setUsername}
         />
       )}
-      {token !== null && 
-      <>      <h2>Add new note</h2>
-      <form onSubmit={addNote}>
-          <input value={newNote} onChange={handleNoteChange} />
-          <button type="submit">save</button>
-        </form>
-      </>
-      }
-            <DisplayNotes notes = {notes} toggleImportanceOf={toggleImportanceOf} />
-
+      {user !== null && (
+        <>
+          <p>{user.name} logged-in</p>
+          <h2>Add new note</h2>
+          <form onSubmit={addNote}>
+            <input value={newNote} onChange={handleNoteChange} />
+            <button type="submit">save</button>
+          </form>
+        </>
+      )}
+      <DisplayNotes notes={notes} toggleImportanceOf={toggleImportanceOf} />
     </div>
-  )
-}
+  );
+};
 
 export default App;
