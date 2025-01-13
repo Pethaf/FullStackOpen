@@ -2,6 +2,7 @@ import { useState } from "react";
 const NewBlogPost = ({ closeModalFunction, saveBlogFunction }) => {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
+  const [url, setUrl] = useState("")
   const handleSaveBlog = (event) => {
     event.preventDefault();
     saveBlogFunction({ title, author });
@@ -28,6 +29,15 @@ const NewBlogPost = ({ closeModalFunction, saveBlogFunction }) => {
               value={author}
               onChange={(e) => setAuthor(e.target.value)}
               id="author"></input>
+          </label>
+          <label htmlFor="url">
+            Url:
+            <input
+              type="text"
+              required
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              id="url"></input>
           </label>
           <button type="submit" disabled={!(title && author)}>
             Save Blog Post
