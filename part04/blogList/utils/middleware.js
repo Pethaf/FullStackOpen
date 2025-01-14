@@ -1,5 +1,5 @@
+const jwt = require("jsonwebtoken");
 const logger = require("./logger");
-
 const requestLogger = (request, response, next) => {
   logger.info("Method:", request.method);
   logger.info("Path:  ", request.path);
@@ -8,7 +8,9 @@ const requestLogger = (request, response, next) => {
   next();
 };
 const tokenExtractor = (request, response, next) => {
-  const authorization = request.get("authorization");
+  console.log("tokenExtractor")
+  const authorization = request.get("Authorization");
+  console.log(`Authorization ${authorization}`)
   if (authorization && authorization.startsWith("Bearer ")) {
     request.token = authorization.replace("Bearer ", "");
   } else {
@@ -18,14 +20,6 @@ const tokenExtractor = (request, response, next) => {
 };
 
 const userExtractor = async (request, response, next) => {
-  const publicRoutes = [{ method: "GET", path: "/api/blogs" }];
-  const isPublicRoute = publicRoutes.some(
-    (route) => route.method === request.method && route.path === request.path
-  );
-  console.log(request.path)
-  if (isPublicRoute) {
-    return next();
-  }
   if (!request.token) {
     return response.status(401).json({ error: "Token missing" });
   }

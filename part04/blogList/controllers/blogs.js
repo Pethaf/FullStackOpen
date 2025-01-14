@@ -2,7 +2,7 @@ const blogRouter = require("express").Router();
 const { response } = require("express");
 const Blog = require("../models/blog");
 const User = require("../models/user");
-const { userExtractor } = require("../utils/middleware");
+const { userExtractor, tokenExtractor } = require("../utils/middleware");
 blogRouter.get("/", async (request, response) => {
   const blogs = await Blog.find({}).populate("user", {
     username: 1,
@@ -12,7 +12,7 @@ blogRouter.get("/", async (request, response) => {
   response.json(blogs);
 });
 
-blogRouter.post("/", userExtractor, async (request, response) => {
+blogRouter.post("/", tokenExtractor, userExtractor, async (request, response) => {
   const user = await User.findById(request.userId);
   if (!user) {
     return response.status(404).json({ error: "User not found" });
@@ -30,7 +30,7 @@ blogRouter.post("/", userExtractor, async (request, response) => {
   await user.save();
   response.status(201).json(savedBlog);
 });
-blogRouter.put("/:id", userExtractor, async (request, response) => {
+blogRouter.put("/:id", tokenExtractor, userExtractor, async (request, response) => {
   const blog = await Blog.findById(request.params.id);
   if (!blog) {
     return response.status(404).json({ error: "Blog not found" });
@@ -46,7 +46,7 @@ blogRouter.put("/:id", userExtractor, async (request, response) => {
   response.send(updatedBlog);
 });
 
-blogRouter.delete("/:id", userExtractor, async (request, response) => {
+blogRouter.delete("/:id", tokenExtractor, userExtractor, async (request, response) => {
   const blog = await Blog.findById(request.params.id);
   if (!blog) {
     return response.status(404).json({ error: "Blog not found" });

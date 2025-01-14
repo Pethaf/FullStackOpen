@@ -67,7 +67,7 @@ describe("When there are blogs in the database", () => {
   });
 });
 
-/*describe("Posting blogs", () => {
+describe("Posting blogs", () => {
   test("Returned blogposts have field named id not _id", async () => {
     const response = await api.get("/api/blogs").expect(200); 
     assert.ok(
@@ -199,7 +199,7 @@ describe("Updating blog", () => {
     assert.equal(updatedBlog["url"], changedBlogFromDB["url"]);
     assert.equal(updatedBlog["likes"], changedBlogFromDB["likes"]);
   });
-});*/
+});
 
 after(async () => {
   await mongoose.connection.close();
