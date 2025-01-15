@@ -1,15 +1,21 @@
 .user-panel {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
 }
 
 .user-panel button {
-    margin-right: 2rem;
-    width: auto;
-    display: inline-block;
+  margin-right: 2rem;
+  width: auto;
+  display: inline-block;
 }
 
 .user-panel p {
-    margin-left: 2rem;
+  margin-left: 2rem;
+}
+
+button:disabled {
+  background-color: dimgrey;
+  color: linen;
+  opacity: 1;
 }

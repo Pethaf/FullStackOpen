@@ -1,15 +1,15 @@
 import { useState } from "react";
-const NewBlogPost = ({ closeModalFunction, saveBlogFunction }) => {
+const NewBlogPost = ({ closeModalFunction, saveBlogFunction, handleCancel }) => {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [url, setUrl] = useState("")
   const handleSaveBlog = (event) => {
     event.preventDefault();
-    saveBlogFunction({ title, author });
+    saveBlogFunction({ title, author, url });
     closeModalFunction();
   };
   return (
-    <div class="modal-wrapper">
+    <div className="modal-wrapper">
       <div>
         <form onSubmit={handleSaveBlog}>
           <label htmlFor="title">
