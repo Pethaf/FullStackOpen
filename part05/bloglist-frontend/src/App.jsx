@@ -14,6 +14,7 @@ const App = () => {
   const [showAddNewBlogPost, setShowAddNewBlogPost] = useState(false);
   const [successMessage, setSuccessMessage] = useState(null);
   const [failureMessage, setFailureMessage] = useState(null);
+  const [loginButtonText, setLoginButtonText] = useState("Login")
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
   }, []);
@@ -67,7 +68,8 @@ const App = () => {
       window.localStorage.setItem("loggedInBlogappUser", JSON.stringify(user));
       setUser(user);
     } catch (error) {
-        displayError("Unable to login")
+        setLoginButtonText("Couldn't login")
+        setTimeout(() => {setLoginButtonText("Login")},2000)
     }
   };
   return (
@@ -101,7 +103,7 @@ const App = () => {
             )}
           </header>
           {user === null ? (
-            <Loginform handleLogin={handleLogin} />
+            <Loginform handleLogin={handleLogin} loginButtonText={loginButtonText}/>
           ) : (
             <Displayblogs blogs={blogs} />
           )}
