@@ -39,7 +39,7 @@ const NewBlogPost = ({ closeModalFunction, saveBlogFunction, handleCancel }) => 
               onChange={(e) => setUrl(e.target.value)}
               id="url"></input>
           </label>
-          <button type="submit" disabled={!(title && author)}>
+          <button type="submit" disabled={!(title && author && url)}>
             Save Blog Post
           </button>
           <button type="button" onClick={handleCancel}>

@@ -54,6 +54,14 @@ const App = () => {
   };
   const handleSaveBlog = async (newBlogPost) => {
     const result = await blogService.create(newBlogPost);
+    console.log(result)
+    if(result.status === 201){
+      displaySuccess(`Blog ${result.data.title} by ${result.data.author} added`)
+      setBlogs([result.data,...blogs])
+    }
+    else {
+      displayError("Something went wrong while trying to post blog")
+    }
   };
   const handleLogout = () => {
     window.localStorage.removeItem("loggedInBlogappUser");
