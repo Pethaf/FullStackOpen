@@ -1,6 +1,6 @@
 import "./Loginform.css"
 import { useState } from "react";
-const Loginform = ({ handleLogin, loginButtonText }) => {
+const LoginForm = ({ handleLogin, loginButtonText }) => {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const login = (event) => {
@@ -39,4 +39,4 @@ const Loginform = ({ handleLogin, loginButtonText }) => {
     </form>
   );
 };
-export default Loginform;
+export default LoginForm;

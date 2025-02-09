@@ -1,120 +1,69 @@
-import { useState, useEffect } from "react";
-import { jwtDecode } from "jwt-decode";
+import { useState } from "react";
+import useAuth from "./hooks/useAuth";
+import useBlogs from "./hooks/useBlogs";
 import Displayblogs from "./components/Displayblogs";
-import blogService from "./services/blogs";
-import loginService from "./services/login";
-import Loginform from "./components/Loginform";
+import LoginForm from "./components/Loginform";
 import NewBlogPost from "./components/NewBlogPost";
 import DisplayFailure from "./components/DisplayFailure";
 import DisplaySuccess from "./components/DisplaySuccess";
 import "./App.css";
+
 const App = () => {
-  const [blogs, setBlogs] = useState([]);
-  const [user, setUser] = useState(null);
+  const { user, login, logout } = useAuth();
+  const { blogs, addBlog } = useBlogs();
   const [showAddNewBlogPost, setShowAddNewBlogPost] = useState(false);
   const [successMessage, setSuccessMessage] = useState(null);
   const [failureMessage, setFailureMessage] = useState(null);
-  const [loginButtonText, setLoginButtonText] = useState("Login")
-  useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
-  }, []);
-  useEffect(() => {
-    const userAsJson = window.localStorage.getItem("loggedInBlogappUser");
-    if (userAsJson) {
-      const user = JSON.parse(userAsJson);
-      const decodedToken = jwtDecode(user.token);
-      const currentTime = Math.floor(Date.now() / 1000);
-      if (decodedToken.exp < currentTime) {
-        window.localStorage.removeItem("loggedInBlogappUser");
-        setUser(null);
-        blogService.setToken(null);
-      } else {
-        const user = JSON.parse(userAsJson);
-        setUser(user);
-        blogService.setToken(user.token);
-      }
+  const [loginButtonText, setLoginButtonText] = useState("Login");
+
+  const displayMessage = (message, type) => {
+    if (type === "success") {
+      setSuccessMessage(message);
+      setTimeout(() => setSuccessMessage(null), 5000);
+    } else {
+      setFailureMessage(message);
+      setTimeout(() => setFailureMessage(null), 5000);
     }
-  }, []);
-  const displayError = (message) => {
-    console.log("")
-    setFailureMessage(message);
-    setTimeout(() => {
-      setFailureMessage(null);
-    }, 5000);
-  };
-  const displaySuccess = (message) => {
-    setSuccessMessage(message);
-    setTimeout(() => {
-      setSuccessMessage(null);
-    }, 5000);
   };
 
-  const handleCancel = () => {
-    setShowAddNewBlogPost(false);
-  };
-  const handleSaveBlog = async (newBlogPost) => {
-    const result = await blogService.create(newBlogPost);
-    console.log(result)
-    if(result.status === 201){
-      displaySuccess(`Blog ${result.data.title} by ${result.data.author} added`)
-      setBlogs([result.data,...blogs])
-    }
-    else {
-      displayError("Something went wrong while trying to post blog")
-    }
-  };
-  const handleLogout = () => {
-    window.localStorage.removeItem("loggedInBlogappUser");
-    setUser(null);
-  };
-  const closeNewBlogPostModal = () => {
-    setShowAddNewBlogPost(false);
-  };
   const handleLogin = async (username, password) => {
-    try {
-      const user = await loginService.login({ username, password });
-      window.localStorage.setItem("loggedInBlogappUser", JSON.stringify(user));
-      setUser(user);
-    } catch (error) {
-        setLoginButtonText("Couldn't login")
-        setTimeout(() => {setLoginButtonText("Login")},2000)
+    const success = await login(username, password);
+    if (!success) {
+      setLoginButtonText("Couldn't login");
+      setTimeout(() => setLoginButtonText("Login"), 2000);
     }
   };
+
+  const handleSaveBlog = async (newBlogPost) => {
+    const result = await addBlog(newBlogPost);
+    displayMessage(result.message, result.success ? "success" : "error");
+  };
+
+  if(!user){
+    return (
+    <LoginForm 
+      handleLogin={handleLogin}
+      loginButtonText={loginButtonText}/>
+    )
+  }
+
   return (
     <div id="app-container">
       {showAddNewBlogPost ? (
-        <NewBlogPost
-          saveBlogFunction={handleSaveBlog}
-          closeModalFunction={() => setShowAddNewBlogPost(false)}
-          handleCancel={handleCancel}
-        />
+        <NewBlogPost saveBlogFunction={handleSaveBlog} closeModalFunction={() => setShowAddNewBlogPost(false)} />
       ) : (
         <>
           <header>
-            <h2>blogs</h2>
+            <h2>Blogs</h2>
             {failureMessage && <DisplayFailure message={failureMessage} />}
             {successMessage && <DisplaySuccess message={successMessage} />}
-            {user !== null && (
-              <div className="user-panel">
-                <p>{user.name} logged in</p>
-                <div>
-                  <button id="logout-button" onClick={handleLogout}>
-                    Logout
-                  </button>
-                  <button
-                    id="add-blog-post-button"
-                    onClick={() => setShowAddNewBlogPost(true)}>
-                    +
-                  </button>
-                </div>
-              </div>
-            )}
+            <div className="user-panel">
+              <p>{user.name} logged in</p>
+              <button id="logout-button" onClick={logout}>Logout</button>
+              <button id="add-blog-post-button" onClick={() => setShowAddNewBlogPost(true)}>+</button>
+            </div>
           </header>
-          {user === null ? (
-            <Loginform handleLogin={handleLogin} loginButtonText={loginButtonText}/>
-          ) : (
-            <Displayblogs blogs={blogs} />
-          )}
+          <Displayblogs blogs={blogs} />
         </>
       )}
     </div>

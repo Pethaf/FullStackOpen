@@ -19,3 +19,23 @@ button:disabled {
   color: linen;
   opacity: 1;
 }
+
+.login-container {
+  position: relative;
+  transition: all 0.3s ease;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.login-container:not(.visible) {
+  visibility: hidden;
+  opacity: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.login-container.visible {
+  visibility: visible;
+  opacity: 1;
+  height: auto; 
+}
