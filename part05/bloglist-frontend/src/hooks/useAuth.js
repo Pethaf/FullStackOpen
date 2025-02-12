@@ -15,7 +15,9 @@ const useAuth = () => {
         const currentTime = Math.floor(Date.now() / 1000);
 
         if (decodedToken.exp < currentTime) {
-          clearUser();
+          window.localStorage.removeItem("loggedInBlogappUser");
+          setUser(null);
+          blogService.setToken(null);
         } else {
           setUser(user);
           blogService.setToken(user.token);
@@ -31,6 +33,7 @@ const useAuth = () => {
   const login = async (username, password) => {
     try {
       const user = await loginService.login({ username, password });
+      console.log(user);
       window.localStorage.setItem("loggedInBlogappUser", JSON.stringify(user));
       setUser(user);
       blogService.setToken(user.token);

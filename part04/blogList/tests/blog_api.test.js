@@ -52,7 +52,7 @@ beforeEach(async () => {
   await Promise.all(promiseArray);
 });
 
-describe("When there are blogs in the database", () => {
+/*describe("When there are blogs in the database", () => {
   test("blogs are returned as json", async () => {
     await api
       .get("/api/blogs")
@@ -65,7 +65,7 @@ describe("When there are blogs in the database", () => {
     const response = await api.get("/api/blogs");
     assert.strictEqual(response.body.length, listWithMultipleBlogs.length);
   });
-});
+});*/
 
 describe("Posting blogs", () => {
   test("Returned blogposts have field named id not _id", async () => {

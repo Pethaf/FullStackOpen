@@ -14,7 +14,7 @@ blogRouter.get("/", async (request, response) => {
 
 blogRouter.post("/", tokenExtractor, userExtractor, async (request, response) => {
   const user = await User.findById(request.userId);
-  if (!user) {
+    if (!user) {
     return response.status(404).json({ error: "User not found" });
   }
   const { title, author, url, likes } = request.body;
