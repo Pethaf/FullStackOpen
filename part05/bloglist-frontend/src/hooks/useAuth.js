@@ -33,7 +33,6 @@ const useAuth = () => {
   const login = async (username, password) => {
     try {
       const user = await loginService.login({ username, password });
-      console.log(user);
       window.localStorage.setItem("loggedInBlogappUser", JSON.stringify(user));
       setUser(user);
       blogService.setToken(user.token);

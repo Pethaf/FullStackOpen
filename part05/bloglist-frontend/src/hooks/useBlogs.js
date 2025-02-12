@@ -11,8 +11,8 @@ const useBlogs = () => {
   const addBlog = async (newBlogPost) => {
     try {
       const result = await blogService.create(newBlogPost);
-      setBlogs([result, ...blogs]);
-      return { success: true, message: `Blog ${result.data.title} by ${result.data.author} added` };
+      setBlogs([...blogs,result]);
+      return { success: true, message: `Blog ${result.title} by ${result.author} added` };
     } catch (error) {
       return { success: false, message: "Something went wrong while trying to post blog" };
     }

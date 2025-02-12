@@ -37,7 +37,8 @@ const App = () => {
   const handleSaveBlog = async (newBlogPost) => {
     const result = await addBlog(newBlogPost);
     displayMessage(result.message, result.success ? "success" : "error");
-  };
+};
+
 
   if(!user){
     return (
