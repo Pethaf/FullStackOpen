@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { jwtDecode } from "jwt-decode";
 import Note from "./components/Note";
 import Notification from "./components/Notification";
 import Footer from "./components/Footer";
@@ -21,10 +22,25 @@ const App = () => {
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedNoteappUser");
+
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON);
-      setUser(user);
-      noteService.setToken(user.token);
+
+      try {
+        const decodedToken = jwtDecode(user.token);
+        const currentTime = Date.now() / 1000; // Convert to seconds
+
+        if (decodedToken.exp < currentTime) {
+          console.log("Token expired");
+          window.localStorage.removeItem("loggedNoteappUser");
+        } else {
+          setUser(user);
+          noteService.setToken(user.token);
+        }
+      } catch (error) {
+        console.error("Invalid token", error);
+        window.localStorage.removeItem("loggedNoteappUser");
+      }
     }
   }, []);
 
@@ -105,7 +121,6 @@ const App = () => {
       </div>
     );
   };
-
   return (
     <div>
       <h1>Notes</h1>
